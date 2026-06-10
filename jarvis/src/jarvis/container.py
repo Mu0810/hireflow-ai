@@ -31,12 +31,14 @@ from .security.confirm import AutoConfirmer, CLIConfirmer
 from .security.gate import SecurityGate
 from .security.permissions import PermissionService
 from .security.sandbox import CommandSandbox, PathJail
+from .tools.android_studio import register_android_studio_tools
 from .tools.browser import BrowserSession, register_browser_tools
 from .tools.computer import register_computer_tools
 from .tools.files import register_file_tools
 from .tools.macos import register_macos_tools
 from .tools.memory_tools import register_memory_tools
 from .tools.registry import Registry
+from .tools.unity import register_unity_tools
 from .voice.status import VoiceStatus
 
 log = get_logger(__name__)
@@ -111,6 +113,8 @@ def build_container(
     register_macos_tools(registry)
     register_browser_tools(registry, browser)
     register_memory_tools(registry, memory)
+    register_android_studio_tools(registry)
+    register_unity_tools(registry)
 
     # --- plugins ---
     plugins = PluginManager(settings, memory, registry)

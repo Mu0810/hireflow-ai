@@ -22,6 +22,7 @@ KNOWN_CAPABILITIES = {
     "network": "Make outbound network requests",
     "memory.write": "Store long-term memories",
     "macos.system": "Control macOS system functions (volume, brightness, screenshots, lock, sleep, apps)",
+    "dev.generate": "Generate code scaffolding (Kotlin, C#, etc.)",
 }
 
 
