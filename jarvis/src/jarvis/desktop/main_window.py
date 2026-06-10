@@ -8,17 +8,17 @@ from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
     QLabel,
-    QLineEdit,
     QMainWindow,
     QMenu,
     QPushButton,
     QSplitter,
     QStackedWidget,
     QSystemTrayIcon,
-    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
+
+from .chat_widget import ChatWidget
 
 from ..logging import get_logger
 
@@ -53,63 +53,6 @@ class OrbWidget(QWidget):
         painter.setPen(Qt.NoPen)
         painter.drawEllipse(rect)
         painter.end()
-
-
-class ChatWidget(QWidget):
-    """Chat interface with streaming text display."""
-
-    message_sent = Signal(str)
-
-    def __init__(self, parent: QWidget | None = None) -> None:
-        super().__init__(parent)
-        self._setup_ui()
-
-    def _setup_ui(self) -> None:
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(12, 12, 12, 12)
-        layout.setSpacing(8)
-
-        self.output = QTextEdit(self)
-        self.output.setReadOnly(True)
-        self.output.setPlaceholderText("Conversation will appear here…")
-        layout.addWidget(self.output, stretch=1)
-
-        input_row = QHBoxLayout()
-        input_row.setSpacing(8)
-        self.input_line = QLineEdit(self)
-        self.input_line.setPlaceholderText("Type a message or press Enter")
-        self.input_line.returnPressed.connect(self._on_send)
-        input_row.addWidget(self.input_line, stretch=1)
-
-        self.send_btn = QPushButton("Send", self)
-        self.send_btn.clicked.connect(self._on_send)
-        input_row.addWidget(self.send_btn)
-
-        layout.addLayout(input_row)
-
-    def _on_send(self) -> None:
-        text = self.input_line.text().strip()
-        if not text:
-            return
-        self.input_line.clear()
-        self.append_message("user", text)
-        self.message_sent.emit(text)
-
-    def append_message(self, role: str, text: str) -> None:
-        colour = "#3b82f6" if role == "assistant" else "#22c55e"
-        name = "Jarvis" if role == "assistant" else "You"
-        self.output.append(f'<span style="color:{colour};font-weight:600">{name} ›</span> {text}')
-
-    def append_chunk(self, text: str) -> None:
-        """Append a streaming chunk to the last assistant message."""
-        # For simplicity, streaming is accumulated and displayed fully.
-        # A richer implementation would edit the last QTextCursor range.
-        self.output.moveCursor(self.output.textCursor().MoveOperation.End)
-        self.output.insertPlainText(text)
-        self.output.ensureCursorVisible()
-
-    def clear_chat(self) -> None:
-        self.output.clear()
 
 
 class DashboardWidget(QWidget):

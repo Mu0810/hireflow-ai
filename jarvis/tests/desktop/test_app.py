@@ -80,13 +80,14 @@ def test_orb_widget(qapp) -> None:
 
 
 def test_chat_widget(qapp) -> None:
-    from jarvis.desktop.main_window import ChatWidget
+    from jarvis.desktop.chat_widget import ChatWidget
 
     chat = ChatWidget()
-    assert chat.output is not None
+    assert chat.messages_container is not None
     assert chat.input_line is not None
     chat.append_message("assistant", "Hello")
-    assert "Hello" in chat.output.toPlainText()
+    assert len(chat._bubbles) == 1
+    assert "Hello" in chat._bubbles[0].body.text()
 
 
 def test_dashboard_widget(qapp) -> None:
