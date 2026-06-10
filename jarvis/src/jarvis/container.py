@@ -34,6 +34,7 @@ from .security.sandbox import CommandSandbox, PathJail
 from .tools.browser import BrowserSession, register_browser_tools
 from .tools.computer import register_computer_tools
 from .tools.files import register_file_tools
+from .tools.macos import register_macos_tools
 from .tools.memory_tools import register_memory_tools
 from .tools.registry import Registry
 from .voice.status import VoiceStatus
@@ -107,6 +108,7 @@ def build_container(
 
     register_file_tools(registry, jail)
     register_computer_tools(registry, sandbox)
+    register_macos_tools(registry)
     register_browser_tools(registry, browser)
     register_memory_tools(registry, memory)
 
