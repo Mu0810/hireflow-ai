@@ -28,11 +28,13 @@ class DesktopApp:
         engine,
         memory,
         voice_status,
+        container=None,
     ) -> None:
         self.settings = settings
         self.engine = engine
         self.memory = memory
         self.voice_status = voice_status
+        self.container = container
         self._app: QApplication | None = None
         self._loop: QEventLoop | None = None
         self._window: MainWindow | None = None
@@ -59,6 +61,23 @@ class DesktopApp:
         )
         self._window.show()
 
+        # Wire PySide6 security dialog confirmer into the container's gate.
+        if self.container is not None:
+            from ..security.confirm import PySide6Confirmer
+            from ..security.gate import SecurityGate
+
+            confirmer = PySide6Confirmer(
+                parent=self._window,
+                require_confirmation=self.settings.require_confirmation,
+            )
+            self._window._confirmer = confirmer
+            self.container.registry.gate = SecurityGate(
+                self.container.permissions,
+                confirmer,
+                self.container.audit,
+            )
+            log.info("PySide6 security confirmer installed")
+
         log.info("Desktop UI started")
         with self._loop:
             self._loop.run_forever()
@@ -70,7 +89,8 @@ def run_desktop(
     engine,
     memory,
     voice_status,
+    container=None,
 ) -> None:
     """Convenience function: build and run the desktop app."""
-    app = DesktopApp(settings, engine, memory, voice_status)
+    app = DesktopApp(settings, engine, memory, voice_status, container=container)
     app.run()

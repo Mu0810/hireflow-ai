@@ -101,6 +101,7 @@ def desktop() -> None:
         engine=container.engine,
         memory=container.memory,
         voice_status=container.voice_status,
+        container=container,
     )
 
 

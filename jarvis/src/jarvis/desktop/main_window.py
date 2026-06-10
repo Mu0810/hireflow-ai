@@ -116,6 +116,13 @@ class MainWindow(QMainWindow):
 
         sidebar_layout.addStretch()
 
+        self.btn_stop = QPushButton("⛔", sidebar)
+        self.btn_stop.setToolTip("Emergency Stop")
+        self.btn_stop.setFixedSize(44, 44)
+        self.btn_stop.setStyleSheet("background-color: #ef4444; color: white; border-radius: 8px;")
+        self.btn_stop.clicked.connect(self._emergency_stop)
+        sidebar_layout.addWidget(self.btn_stop)
+
         self.btn_theme = QPushButton("🌙", sidebar)
         self.btn_theme.setToolTip("Toggle theme")
         self.btn_theme.setFixedSize(44, 44)
@@ -201,6 +208,20 @@ class MainWindow(QMainWindow):
 
         apply_theme(QApplication.instance(), self._dark_mode)
         self.btn_theme.setText("🌙" if self._dark_mode else "☀️")
+
+    def _emergency_stop(self) -> None:
+        """Activate emergency stop — deny all dangerous actions and show status."""
+        if hasattr(self, "_confirmer") and self._confirmer is not None:
+            self._confirmer.trigger_emergency_stop()
+        from PySide6.QtWidgets import QMessageBox
+        QMessageBox.warning(
+            self,
+            "Emergency Stop",
+            "Emergency stop activated. All dangerous actions will be denied until the app is restarted.",
+        )
+        self.chat_widget.append_message(
+            "assistant", "🛑 Emergency stop activated. Dangerous actions are now blocked."
+        )
 
     def _toggle_floating(self, checked: bool | None = None) -> None:
         if checked is None:
