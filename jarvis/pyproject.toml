@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jarvis-assistant"
+version = "0.1.0"
+description = "Always-on, voice-capable, modular personal AI assistant"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Jarvis" }]
+
+dependencies = [
+    # --- core runtime ---
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "httpx>=0.27",
+    "typer>=0.12",
+    "rich>=13.7",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "websockets>=12.0",
+    "anyio>=4.3",
+    # --- memory / ORM ---
+    "chromadb>=0.5.0",
+    "sqlalchemy>=2.0.0",
+    # --- tools ---
+    "playwright>=1.43",
+    # --- channels ---
+    "python-telegram-bot>=21.0",
+    # --- mcp ---
+    "mcp>=1.0.0",
+]
+
+[project.optional-dependencies]
+voice = [
+    "openwakeword>=0.6.0",
+    "faster-whisper>=1.0.0",
+    "piper-tts>=1.2.0",
+    "sounddevice>=0.4.6",
+    "numpy>=1.26",
+]
+discord = ["discord.py>=2.3"]
+slack = ["slack-bolt>=1.18"]
+dev = [
+    "pytest>=8.1",
+    "pytest-asyncio>=0.23",
+    "respx>=0.21",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+jarvis = "jarvis.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+jarvis = ["memory/schema.sql", "api/web/templates/*.html", "api/web/static/*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]

@@ -17,6 +17,7 @@ from typing import Any
 from .agent.engine import AgentEngine
 from .config import Settings, get_settings
 from .core.interfaces import Confirmer
+from .db.engine import create_db_engine, init_db
 from .llm.kimchi import KimchiProvider
 from .llm.openrouter import OpenRouterProvider
 from .logging import get_logger, setup_logging
@@ -78,6 +79,10 @@ def build_container(
     vectors = ChromaVectorStore(settings.chroma_dir, prefer_fallback=settings.vector_fallback)
     memory = MemoryService(store, vectors)
     memory.init()
+
+    # --- SQLAlchemy ORM ---
+    db_engine = create_db_engine(settings.sqlite_path)
+    init_db(db_engine)
 
     # --- security ---
     permissions = PermissionService(settings.allowed_capabilities)
