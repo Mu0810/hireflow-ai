@@ -54,6 +54,8 @@ class Container:
     browser: BrowserSession
     engine: AgentEngine
     voice_status: VoiceStatus
+    # SQLAlchemy engine for relational ORM access (PySide6 UI, dashboards).
+    db_engine: Any = None
 
     async def startup(self) -> None:
         """Async initialisation: connect MCP servers (best-effort)."""
@@ -151,4 +153,5 @@ def build_container(
         browser=browser,
         engine=engine,  # type: ignore[arg-type]
         voice_status=VoiceStatus(),
+        db_engine=db_engine,
     )
