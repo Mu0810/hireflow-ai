@@ -69,18 +69,22 @@ class DashboardWidget(QWidget):
 class MainWindow(QMainWindow):
     """Primary PySide6 window for the JARVIS desktop experience."""
 
-    def __init__(self, settings, engine, memory, voice_status) -> None:
+    def __init__(self, settings, engine, memory, voice_status, container=None) -> None:
         super().__init__()
         self.settings = settings
         self.engine = engine
         self.memory = memory
         self.voice_status = voice_status
+        self.container = container
         self._conversation_id: str | None = None
         self._dark_mode = True
         self._floating = False
+        self._voice_controller = None
+        self._voice_bridge = None
         self._setup_ui()
         self._setup_tray()
         self._setup_shortcuts()
+        self._setup_voice()
         self._start_new_conversation()
 
     def _setup_ui(self) -> None:
@@ -122,6 +126,13 @@ class MainWindow(QMainWindow):
         self.btn_stop.setStyleSheet("background-color: #ef4444; color: white; border-radius: 8px;")
         self.btn_stop.clicked.connect(self._emergency_stop)
         sidebar_layout.addWidget(self.btn_stop)
+
+        self.btn_voice = QPushButton("🎙", sidebar)
+        self.btn_voice.setToolTip("Toggle voice loop")
+        self.btn_voice.setFixedSize(44, 44)
+        self.btn_voice.setCheckable(True)
+        self.btn_voice.clicked.connect(self._toggle_voice)
+        sidebar_layout.addWidget(self.btn_voice)
 
         self.btn_theme = QPushButton("🌙", sidebar)
         self.btn_theme.setToolTip("Toggle theme")
@@ -222,6 +233,55 @@ class MainWindow(QMainWindow):
         self.chat_widget.append_message(
             "assistant", "🛑 Emergency stop activated. Dangerous actions are now blocked."
         )
+
+    # -- voice integration -------------------------------------------------
+    def _setup_voice(self) -> None:
+        if self.voice_status is None:
+            return
+        from .voice_bridge import VoiceBridge
+
+        self._voice_bridge = VoiceBridge(self.voice_status)
+        self._voice_bridge.state_changed.connect(self._on_voice_state_changed)
+        self._voice_bridge.transcript_received.connect(self._on_voice_transcript)
+        self._voice_bridge.reply_received.connect(self._on_voice_reply)
+        self._voice_bridge.start()
+
+    def _toggle_voice(self, checked: bool) -> None:
+        import asyncio
+
+        if self.container is None:
+            return
+        if self._voice_controller is None:
+            try:
+                from ..voice.controller import VoiceController
+                self._voice_controller = VoiceController(self.container)
+            except Exception as exc:
+                log.warning("Voice controller unavailable: %s", exc)
+                return
+        if checked:
+            asyncio.create_task(self._voice_controller.start())
+            self.btn_voice.setStyleSheet("background-color: #22c55e; color: white; border-radius: 8px;")
+        else:
+            asyncio.create_task(self._voice_controller.stop())
+            self.btn_voice.setStyleSheet("")
+
+    def _on_voice_state_changed(self, state: str, _extra: dict) -> None:
+        colours = {
+            "idle": "#3b82f6",
+            "listening": "#22c55e",
+            "thinking": "#f59e0b",
+            "speaking": "#e2e8f0",
+            "offline": "#6b7280",
+        }
+        self.orb.set_state(colours.get(state, "#3b82f6"), pulse=(state in ("listening", "speaking")))
+
+    def _on_voice_transcript(self, text: str) -> None:
+        if text:
+            self.chat_widget.append_message("user", text)
+
+    def _on_voice_reply(self, text: str) -> None:
+        if text:
+            self.chat_widget.append_message("assistant", text)
 
     def _toggle_floating(self, checked: bool | None = None) -> None:
         if checked is None:

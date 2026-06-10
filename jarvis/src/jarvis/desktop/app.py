@@ -58,6 +58,7 @@ class DesktopApp:
             self.engine,
             self.memory,
             self.voice_status,
+            container=self.container,
         )
         self._window.show()
 
