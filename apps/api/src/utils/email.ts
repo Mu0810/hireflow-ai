@@ -21,6 +21,12 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions): Promis
     return;
   }
 
+  if (!env.SMTP_USER || !env.SMTP_PASS) {
+    console.log("[DEV EMAIL] To:", to, "Subject:", subject);
+    console.log("[DEV EMAIL] Body:", html);
+    return;
+  }
+
   await transporter.sendMail({
     from: env.EMAIL_FROM,
     to,
