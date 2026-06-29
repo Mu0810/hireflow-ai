@@ -5,13 +5,14 @@ import { UserRole } from "@prisma/client";
 import { prisma } from "./db";
 import { env } from "./env";
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: env.GOOGLE_CLIENT_ID || "",
-      clientSecret: env.GOOGLE_CLIENT_SECRET || "",
-      callbackURL: `${env.API_URL}/api/auth/google/callback`,
-    },
+if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        callbackURL: `${env.API_URL}/api/auth/google/callback`,
+      },
     async (_accessToken, _refreshToken, profile, done) => {
       const email = profile.emails?.[0]?.value;
       if (!email) {
@@ -49,16 +50,18 @@ passport.use(
 
       return done(null, user);
     }
-  )
-);
+    )
+  );
+}
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: env.GITHUB_CLIENT_ID || "",
-      clientSecret: env.GITHUB_CLIENT_SECRET || "",
-      callbackURL: `${env.API_URL}/api/auth/github/callback`,
-    },
+if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
+  passport.use(
+    new GitHubStrategy(
+      {
+        clientID: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
+        callbackURL: `${env.API_URL}/api/auth/github/callback`,
+      },
     async (_accessToken, _refreshToken, profile, done) => {
       const email = profile.emails?.[0]?.value || `${profile.username}@github.local`;
 
@@ -93,8 +96,9 @@ passport.use(
 
       return done(null, user);
     }
-  )
-);
+    )
+  );
+}
 
 passport.serializeUser((user, done) => done(null, (user as any).id));
 passport.deserializeUser(async (id: string, done) => {
