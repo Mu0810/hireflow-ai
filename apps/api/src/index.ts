@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env";
+import { passport } from "./config/passport";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import adminRoutes from "./routes/admin.routes";
@@ -11,6 +12,7 @@ import adminRoutes from "./routes/admin.routes";
 const app = express();
 
 app.use(helmet());
+app.use(passport.initialize());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
