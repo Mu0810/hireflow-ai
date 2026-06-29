@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { QueryProvider } from "@/providers/query-provider";
 
 export const metadata: Metadata = {
   title: "HireFlow AI",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-background antialiased">{children}</body>
+      <body className="min-h-screen bg-background antialiased">
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }
