@@ -13,6 +13,8 @@ import profileRoutes from "./routes/profile.routes";
 import jobRoutes from "./routes/job.routes";
 import codingRoutes from "./routes/coding.routes";
 import interviewRoutes from "./routes/interview.routes";
+import notificationRoutes from "./routes/notification.routes";
+import analyticsRoutes from "./routes/analytics.routes";
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/coding", codingRoutes);
 app.use("/api/interviews", interviewRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 const PORT = env.PORT;
 

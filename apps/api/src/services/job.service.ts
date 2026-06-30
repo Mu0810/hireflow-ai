@@ -1,6 +1,7 @@
-import { ApplicationStatus, JobStatus } from "@prisma/client";
+import { ApplicationStatus, JobStatus, NotificationType } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateJobInput, UpdateJobInput, ApplyToJobInput } from "@hireflow/shared";
+import { createNotification } from "./notification.service";
 
 export async function createJob(userId: string, input: CreateJobInput) {
   const member = await prisma.companyMember.findFirst({
@@ -178,14 +179,24 @@ export async function applyToJob(userId: string, input: ApplyToJobInput) {
     throw new Error("You have already applied to this job");
   }
 
-  return prisma.application.create({
+  const application = await prisma.application.create({
     data: {
       jobId: input.jobId,
       candidateId: userId,
       coverLetter: input.coverLetter || null,
       resumeUrl: input.resumeUrl || null,
     },
+    include: { job: true },
   });
+
+  await createNotification(
+    application.job.postedById,
+    "New application",
+    `A candidate applied to ${application.job.title}`,
+    NotificationType.APPLICATION
+  );
+
+  return application;
 }
 
 export async function getMyApplications(userId: string) {
@@ -257,8 +268,18 @@ export async function updateApplicationStatus(
     throw new Error("Access denied");
   }
 
-  return prisma.application.update({
+  const updated = await prisma.application.update({
     where: { id: applicationId },
     data: { status },
+    include: { job: true },
   });
+
+  await createNotification(
+    application.candidateId,
+    "Application status updated",
+    `Your application for ${updated.job.title} is now ${status}`,
+    NotificationType.STATUS_UPDATE
+  );
+
+  return updated;
 }

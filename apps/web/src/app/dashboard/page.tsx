@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useMyCompanies } from "@/hooks/use-companies";
+import { useUnreadNotifications } from "@/hooks/use-notifications";
 import Link from "next/link";
 
 export default function DashboardPage() {
   const { user, clearAuth } = useAuthStore();
   const router = useRouter();
   const { data: companies, isLoading } = useMyCompanies();
+  const { data: unreadNotifications } = useUnreadNotifications();
 
   const handleLogout = async () => {
     await api.post("/api/auth/logout");
@@ -23,6 +25,25 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <div className="flex gap-3">
+          <Link href="/jobs">
+            <Button variant="outline">Browse jobs</Button>
+          </Link>
+          <Link href="/interviews">
+            <Button variant="outline">Interviews</Button>
+          </Link>
+          <Link href="/notifications">
+            <Button variant="outline">
+              Notifications{" "}
+              {unreadNotifications?.length > 0 && (
+                <span className="ml-1 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
+                  {unreadNotifications.length}
+                </span>
+              )}
+            </Button>
+          </Link>
+          <Link href="/analytics">
+            <Button variant="outline">Analytics</Button>
+          </Link>
           <Link href="/profile">
             <Button variant="outline">My profile</Button>
           </Link>

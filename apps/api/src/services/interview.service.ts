@@ -1,6 +1,7 @@
-import { InterviewStatus } from "@prisma/client";
+import { InterviewStatus, NotificationType } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateInterviewInput, UpdateInterviewInput, SendMessageInput } from "@hireflow/shared";
+import { createNotification } from "./notification.service";
 
 export async function createInterview(userId: string, input: CreateInterviewInput) {
   const application = await prisma.application.findUnique({
@@ -24,7 +25,7 @@ export async function createInterview(userId: string, input: CreateInterviewInpu
     throw new Error("Access denied");
   }
 
-  return prisma.interview.create({
+  const interview = await prisma.interview.create({
     data: {
       applicationId: input.applicationId,
       scheduledAt: new Date(input.scheduledAt),
@@ -42,6 +43,15 @@ export async function createInterview(userId: string, input: CreateInterviewInpu
       },
     },
   });
+
+  await createNotification(
+    application.candidateId,
+    "Interview scheduled",
+    `You have a ${interview.type} interview for ${application.job.title} on ${new Date(interview.scheduledAt).toLocaleString()}`,
+    NotificationType.INTERVIEW
+  );
+
+  return interview;
 }
 
 export async function getInterview(userId: string, interviewId: string) {
@@ -156,7 +166,7 @@ export async function sendMessage(userId: string, input: SendMessageInput) {
     }
   }
 
-  return prisma.message.create({
+  const message = await prisma.message.create({
     data: {
       interviewId: input.interviewId,
       senderId: userId,
@@ -166,4 +176,14 @@ export async function sendMessage(userId: string, input: SendMessageInput) {
       sender: { select: { id: true, name: true, email: true } },
     },
   });
+
+  const recipientId = interview.createdById === userId ? interview.application.candidateId : interview.createdById;
+  await createNotification(
+    recipientId,
+    "New message",
+    `New message from ${message.sender.name || message.sender.email} regarding ${interview.application.job.title}`,
+    NotificationType.MESSAGE
+  );
+
+  return message;
 }
