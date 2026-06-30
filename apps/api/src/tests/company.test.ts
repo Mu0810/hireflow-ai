@@ -49,6 +49,29 @@ describe("POST /api/companies", () => {
     expect(res.body.data.slug).toBe("acme-inc");
   });
 
+  it("auto-creates a FREE/ACTIVE subscription for the new company", async () => {
+    const token = await registerAndVerify("subowner@example.com", "CANDIDATE");
+
+    const companyRes = await request(app)
+      .post("/api/companies")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        name: "Sub Co",
+        slug: "sub-co",
+      });
+
+    expect(companyRes.status).toBe(201);
+    const companyId = companyRes.body.data.id;
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { companyId },
+    });
+
+    expect(subscription).toBeTruthy();
+    expect(subscription?.plan).toBe("FREE");
+    expect(subscription?.status).toBe("ACTIVE");
+  });
+
   it("rejects duplicate slug", async () => {
     const token = await registerAndVerify("owner2@example.com", "CANDIDATE");
 

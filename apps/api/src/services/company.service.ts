@@ -47,6 +47,14 @@ export async function createCompany(userId: string, input: CreateCompanyInput) {
       data: { role: UserRole.COMPANY_ADMIN },
     });
 
+    await tx.subscription.create({
+      data: {
+        companyId: company.id,
+        plan: "FREE",
+        status: "ACTIVE",
+      },
+    });
+
     return company;
   });
 

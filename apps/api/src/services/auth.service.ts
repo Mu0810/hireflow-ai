@@ -48,7 +48,7 @@ export async function registerUser(input: RegisterInput) {
       subject: "Verify your HireFlow AI account",
       html: verificationEmailHtml(verificationToken.token),
     });
-  } else {
+  } else if (env.NODE_ENV === "development") {
     await prisma.user.update({
       where: { id: user.id },
       data: { emailVerified: true },
