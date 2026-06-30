@@ -4,3 +4,5 @@ export * from "./types/company";
 export * from "./schemas/company";
 export * from "./types/profile";
 export * from "./schemas/profile";
+export * from "./types/job";
+export * from "./schemas/job";

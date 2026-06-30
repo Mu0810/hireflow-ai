@@ -41,6 +41,8 @@ model User {
   ownedCompanies     Company[]       @relation("CompanyOwner")
   companyMemberships CompanyMember[]
   sentInvites        CompanyInvite[] @relation("InviteSender")
+  postedJobs         Job[]
+  applications       Application[]
 
   candidateProfile   CandidateProfile?
 
@@ -63,6 +65,7 @@ model Company {
   owner       User            @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members     CompanyMember[]
   invites     CompanyInvite[]
+  jobs        Job[]
 
   @@index([slug])
   @@map("companies")
@@ -252,6 +255,7 @@ model Skill {
   createdAt DateTime         @default(now())
 
   candidates CandidateSkill[]
+  jobSkills  JobSkill[]
 
   @@map("skills")
 }
@@ -269,4 +273,77 @@ model CandidateSkill {
 
   @@unique([profileId, skillId])
   @@map("candidate_skills")
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+model Job {
+  id           String    @id @default(uuid())
+  title        String
+  description  String
+  experience   String?
+  salary       String?
+  location     String?
+  remote       Boolean   @default(false)
+  deadline     DateTime?
+  benefits     String?
+  openings     Int       @default(1)
+  status       JobStatus @default(OPEN)
+  companyId    String
+  postedById   String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  postedBy     User          @relation(fields: [postedById], references: [id], onDelete: Cascade)
+  applications Application[]
+  skills       JobSkill[]
+
+  @@index([companyId])
+  @@index([status])
+  @@map("jobs")
+}
+
+model JobSkill {
+  id      String @id @default(uuid())
+  jobId   String
+  skillId String
+
+  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, skillId])
+  @@map("job_skills")
+}
+
+model Application {
+  id          String            @id @default(uuid())
+  jobId       String
+  candidateId String
+  status      ApplicationStatus @default(APPLIED)
+  coverLetter String?
+  resumeUrl   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidate User @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, candidateId])
+  @@index([candidateId])
+  @@index([jobId])
+  @@map("applications")
 }

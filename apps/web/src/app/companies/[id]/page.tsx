@@ -1,7 +1,9 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { useCompany, useInviteMember } from "@/hooks/use-companies";
+import { useCompanyJobs } from "@/hooks/use-jobs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +16,7 @@ export default function CompanyDetailPage() {
   const params = useParams();
   const id = params.id as string;
   const { data: company, isLoading } = useCompany(id);
+  const { data: jobs } = useCompanyJobs(id);
   const inviteMember = useInviteMember(id);
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
@@ -64,6 +67,41 @@ export default function CompanyDetailPage() {
             Verified
           </span>
         )}
+      </div>
+
+      <div className="mt-8 rounded-lg border p-6 shadow">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">Open positions</h2>
+          <Link href={`/companies/${id}/jobs/new`}>
+            <Button variant="outline">Post a job</Button>
+          </Link>
+        </div>
+        <div className="mt-4 space-y-3">
+          {jobs?.map((job: any) => (
+            <Link
+              key={job.id}
+              href={`/jobs/${job.id}`}
+              className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted"
+            >
+              <div>
+                <p className="font-medium">{job.title}</p>
+                <p className="text-sm text-muted-foreground">
+                  {job.location} · {job.remote ? "Remote" : "On-site"} · {job._count?.applications} applications
+                </p>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium uppercase ${
+                  job.status === "OPEN"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {job.status}
+              </span>
+            </Link>
+          ))}
+          {jobs?.length === 0 && <p className="text-sm text-muted-foreground">No jobs posted yet.</p>}
+        </div>
       </div>
 
       <div className="mt-8 rounded-lg border p-6 shadow">
