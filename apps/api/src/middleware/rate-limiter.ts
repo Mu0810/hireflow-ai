@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { env } from "../config/env";
 
 interface RateLimitEntry {
   count: number;
@@ -11,6 +12,10 @@ const MAX_REQUESTS = 100;
 
 export function rateLimiter(maxRequests = MAX_REQUESTS, windowMs = WINDOW_MS) {
   return (req: Request, res: Response, next: NextFunction) => {
+    if (env.NODE_ENV !== "production") {
+      return next();
+    }
+
     const key = req.ip || "anonymous";
     const now = Date.now();
     const entry = store.get(key);
