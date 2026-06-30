@@ -89,6 +89,9 @@ export default function CompanyDetailPage() {
                 </p>
               </Link>
               <div className="flex items-center gap-2">
+                <Link href={`/jobs/${job.id}/coding-tests`}>
+                  <Button variant="ghost" size="sm">Tests</Button>
+                </Link>
                 <Link href={`/jobs/${job.id}/applications`}>
                   <Button variant="ghost" size="sm">Applications</Button>
                 </Link>

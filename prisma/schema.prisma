@@ -43,6 +43,8 @@ model User {
   sentInvites        CompanyInvite[] @relation("InviteSender")
   postedJobs         Job[]
   applications       Application[]
+  createdCodingTests CodingTest[]
+  codingSubmissions  CodingSubmission[]
 
   candidateProfile   CandidateProfile?
 
@@ -309,8 +311,9 @@ model Job {
 
   company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
   postedBy     User          @relation(fields: [postedById], references: [id], onDelete: Cascade)
-  applications Application[]
-  skills       JobSkill[]
+  applications  Application[]
+  skills        JobSkill[]
+  codingTests   CodingTest[]
 
   @@index([companyId])
   @@index([status])
@@ -348,4 +351,55 @@ model Application {
   @@index([candidateId])
   @@index([jobId])
   @@map("applications")
+}
+
+enum CodingLanguage {
+  JAVASCRIPT
+  PYTHON
+  TYPESCRIPT
+}
+
+enum CodingSubmissionStatus {
+  PENDING
+  PASSED
+  FAILED
+  ERROR
+}
+
+model CodingTest {
+  id              String             @id @default(uuid())
+  jobId           String
+  title           String
+  description     String
+  timeLimitMinutes Int               @default(30)
+  language        CodingLanguage     @default(JAVASCRIPT)
+  starterCode     String?
+  testCases       String
+  createdById     String
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  job         Job                 @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdBy   User                @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  submissions CodingSubmission[]
+
+  @@map("coding_tests")
+}
+
+model CodingSubmission {
+  id          String                 @id @default(uuid())
+  testId      String
+  candidateId String
+  code        String
+  status      CodingSubmissionStatus @default(PENDING)
+  score       Float?
+  results     String?
+  startedAt   DateTime               @default(now())
+  submittedAt DateTime?
+
+  test      CodingTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+  candidate User       @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, candidateId])
+  @@map("coding_submissions")
 }

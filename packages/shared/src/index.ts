@@ -6,3 +6,5 @@ export * from "./types/profile";
 export * from "./schemas/profile";
 export * from "./types/job";
 export * from "./schemas/job";
+export * from "./types/coding";
+export * from "./schemas/coding";
