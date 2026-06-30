@@ -1,1 +1,11 @@
 .worktrees
+node_modules
+.env
+.env.local
+.env.*.local
+dist
+.turbo
+*.log
+.DS_Store
+.next
+coverage
