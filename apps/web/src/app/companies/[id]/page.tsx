@@ -62,11 +62,16 @@ export default function CompanyDetailPage() {
           )}
           {company.description && <p className="mt-2 text-muted-foreground">{company.description}</p>}
         </div>
-        {company.verified && (
-          <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
-            Verified
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          <Link href={`/companies/${id}/subscription`}>
+            <Button variant="outline" size="sm">Subscription</Button>
+          </Link>
+          {company.verified && (
+            <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+              Verified
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-8 rounded-lg border p-6 shadow">

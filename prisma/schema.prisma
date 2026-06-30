@@ -48,6 +48,7 @@ model User {
   createdInterviews  Interview[]
   sentMessages       Message[] @relation("MessageSender")
   notifications      Notification[]
+  referrals          Referral[]
 
   candidateProfile   CandidateProfile?
 
@@ -67,10 +68,12 @@ model Company {
   updatedAt   DateTime @updatedAt
 
   ownerId     String
-  owner       User            @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members     CompanyMember[]
-  invites     CompanyInvite[]
-  jobs        Job[]
+  owner          User            @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members        CompanyMember[]
+  invites        CompanyInvite[]
+  jobs           Job[]
+  subscription   Subscription?
+  referrals      Referral[]
 
   @@index([slug])
   @@map("companies")
@@ -317,6 +320,7 @@ model Job {
   applications  Application[]
   skills        JobSkill[]
   codingTests   CodingTest[]
+  referrals     Referral[]
 
   @@index([companyId])
   @@index([status])
@@ -474,4 +478,58 @@ model Notification {
 
   @@index([userId, read])
   @@map("notifications")
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+}
+
+model Subscription {
+  id        String             @id @default(uuid())
+  companyId String             @unique
+  plan      SubscriptionPlan   @default(FREE)
+  status    SubscriptionStatus @default(ACTIVE)
+  expiresAt DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+enum ReferralStatus {
+  PENDING
+  HIRED
+  REWARDED
+}
+
+model Referral {
+  id             String         @id @default(uuid())
+  referrerId     String
+  companyId      String
+  candidateEmail String
+  candidateName  String?
+  jobId          String?
+  status         ReferralStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  referrer User    @relation(fields: [referrerId], references: [id], onDelete: Cascade)
+  company  Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  job      Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([companyId])
+  @@index([jobId])
+  @@map("referrals")
 }

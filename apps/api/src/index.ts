@@ -15,6 +15,7 @@ import codingRoutes from "./routes/coding.routes";
 import interviewRoutes from "./routes/interview.routes";
 import notificationRoutes from "./routes/notification.routes";
 import analyticsRoutes from "./routes/analytics.routes";
+import subscriptionRoutes from "./routes/subscription.routes";
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use("/api/coding", codingRoutes);
 app.use("/api/interviews", interviewRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
 
 const PORT = env.PORT;
 
