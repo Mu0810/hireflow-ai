@@ -45,6 +45,8 @@ model User {
   applications       Application[]
   createdCodingTests CodingTest[]
   codingSubmissions  CodingSubmission[]
+  createdInterviews  Interview[]
+  sentMessages       Message[] @relation("MessageSender")
 
   candidateProfile   CandidateProfile?
 
@@ -344,8 +346,9 @@ model Application {
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 
-  job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  candidate User @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job          Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidate    User          @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interviews   Interview[]
 
   @@unique([jobId, candidateId])
   @@index([candidateId])
@@ -402,4 +405,50 @@ model CodingSubmission {
 
   @@unique([testId, candidateId])
   @@map("coding_submissions")
+}
+
+enum InterviewType {
+  PHONE
+  VIDEO
+  IN_PERSON
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model Interview {
+  id              String          @id @default(uuid())
+  applicationId   String
+  scheduledAt     DateTime
+  durationMinutes Int             @default(30)
+  type            InterviewType
+  status          InterviewStatus @default(SCHEDULED)
+  notes           String?
+  createdById     String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  createdBy   User        @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  messages    Message[]
+
+  @@index([applicationId])
+  @@map("interviews")
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  interviewId String
+  senderId    String
+  content     String
+  createdAt   DateTime @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  sender    User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([interviewId])
+  @@map("messages")
 }

@@ -12,6 +12,7 @@ import companyRoutes from "./routes/company.routes";
 import profileRoutes from "./routes/profile.routes";
 import jobRoutes from "./routes/job.routes";
 import codingRoutes from "./routes/coding.routes";
+import interviewRoutes from "./routes/interview.routes";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/companies", companyRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/coding", codingRoutes);
+app.use("/api/interviews", interviewRoutes);
 
 const PORT = env.PORT;
 
