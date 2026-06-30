@@ -77,6 +77,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         data: education.map((e) => ({
           ...e,
           profileId: profile.id,
+          startDate: new Date(e.startDate),
           fieldOfStudy: e.fieldOfStudy || null,
           endDate: e.endDate ? new Date(e.endDate) : null,
           gpa: e.gpa || null,
@@ -92,6 +93,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         data: experience.map((e) => ({
           ...e,
           profileId: profile.id,
+          startDate: new Date(e.startDate),
           description: e.description || null,
           endDate: e.endDate ? new Date(e.endDate) : null,
           location: e.location || null,
@@ -124,6 +126,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         data: certifications.map((c) => ({
           ...c,
           profileId: profile.id,
+          issueDate: new Date(c.issueDate),
           expiryDate: c.expiryDate ? new Date(c.expiryDate) : null,
           credentialId: c.credentialId || null,
           url: c.url || null,

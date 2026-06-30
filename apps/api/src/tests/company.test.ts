@@ -2,16 +2,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
 import { app } from "../index";
 import { prisma } from "../config/db";
+import { cleanDatabase } from "./helpers";
 
 beforeEach(async () => {
-  await prisma.companyInvite.deleteMany();
-  await prisma.companyMember.deleteMany();
-  await prisma.company.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.verificationToken.deleteMany();
-  await prisma.passwordReset.deleteMany();
-  await prisma.account.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanDatabase();
 });
 
 async function registerAndVerify(email: string, role: string) {
