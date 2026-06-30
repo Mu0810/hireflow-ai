@@ -22,7 +22,12 @@ export default function DashboardPage() {
     <div className="p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Button onClick={handleLogout}>Logout</Button>
+        <div className="flex gap-3">
+          <Link href="/profile">
+            <Button variant="outline">My profile</Button>
+          </Link>
+          <Button onClick={handleLogout}>Logout</Button>
+        </div>
       </div>
       <p className="mt-4">Welcome, {user?.name || user?.email}</p>
       <p className="text-sm text-muted-foreground">Role: {user?.role}</p>
