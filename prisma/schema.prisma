@@ -14,6 +14,12 @@ enum UserRole {
   CANDIDATE
 }
 
+enum CompanyMemberRole {
+  OWNER
+  ADMIN
+  RECRUITER
+}
+
 model User {
   id                 String    @id @default(uuid())
   email              String    @unique
@@ -32,8 +38,65 @@ model User {
   verificationTokens VerificationToken[]
   passwordResets     PasswordReset[]
 
+  ownedCompanies     Company[]       @relation("CompanyOwner")
+  companyMemberships CompanyMember[]
+  sentInvites        CompanyInvite[] @relation("InviteSender")
+
   @@index([email])
   @@map("users")
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  website     String?
+  description String?
+  logoUrl     String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId     String
+  owner       User            @relation("CompanyOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     CompanyMember[]
+  invites     CompanyInvite[]
+
+  @@index([slug])
+  @@map("companies")
+}
+
+model CompanyMember {
+  id        String            @id @default(uuid())
+  companyId String
+  userId    String
+  role      CompanyMemberRole @default(RECRUITER)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@map("company_members")
+}
+
+model CompanyInvite {
+  id        String            @id @default(uuid())
+  email     String
+  token     String            @unique @default(uuid())
+  companyId String
+  role      CompanyMemberRole @default(RECRUITER)
+  invitedBy String
+  expiresAt DateTime
+  accepted  Boolean           @default(false)
+  createdAt DateTime          @default(now())
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sender    User    @relation("InviteSender", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, email])
+  @@map("company_invites")
 }
 
 model Account {
