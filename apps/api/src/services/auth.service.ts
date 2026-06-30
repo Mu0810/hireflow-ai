@@ -9,6 +9,7 @@ import {
   verifyRefreshToken,
 } from "../utils/tokens";
 import { RegisterInput, LoginInput } from "@hireflow/shared";
+import { env } from "../config/env";
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
@@ -41,11 +42,21 @@ export async function registerUser(input: RegisterInput) {
     },
   });
 
-  await sendEmail({
-    to: user.email,
-    subject: "Verify your HireFlow AI account",
-    html: verificationEmailHtml(verificationToken.token),
-  });
+  if (env.NODE_ENV === "production") {
+    await sendEmail({
+      to: user.email,
+      subject: "Verify your HireFlow AI account",
+      html: verificationEmailHtml(verificationToken.token),
+    });
+  } else {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+    });
+    await prisma.verificationToken.delete({
+      where: { token: verificationToken.token },
+    });
+  }
 
   return { userId: user.id, email: user.email };
 }
