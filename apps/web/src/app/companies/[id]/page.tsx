@@ -78,27 +78,31 @@ export default function CompanyDetailPage() {
         </div>
         <div className="mt-4 space-y-3">
           {jobs?.map((job: any) => (
-            <Link
+            <div
               key={job.id}
-              href={`/jobs/${job.id}`}
               className="flex items-center justify-between rounded-md border p-3 transition-colors hover:bg-muted"
             >
-              <div>
+              <Link href={`/jobs/${job.id}`} className="flex-1">
                 <p className="font-medium">{job.title}</p>
                 <p className="text-sm text-muted-foreground">
                   {job.location} · {job.remote ? "Remote" : "On-site"} · {job._count?.applications} applications
                 </p>
+              </Link>
+              <div className="flex items-center gap-2">
+                <Link href={`/jobs/${job.id}/applications`}>
+                  <Button variant="ghost" size="sm">Applications</Button>
+                </Link>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium uppercase ${
+                    job.status === "OPEN"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-secondary text-secondary-foreground"
+                  }`}
+                >
+                  {job.status}
+                </span>
               </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-medium uppercase ${
-                  job.status === "OPEN"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {job.status}
-              </span>
-            </Link>
+            </div>
           ))}
           {jobs?.length === 0 && <p className="text-sm text-muted-foreground">No jobs posted yet.</p>}
         </div>

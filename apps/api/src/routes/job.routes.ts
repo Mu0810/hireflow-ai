@@ -13,6 +13,10 @@ import {
   updateApplicationStatusHandler,
 } from "../controllers/job.controller";
 import {
+  screenApplicationHandler,
+  getApplicationScreeningHandler,
+} from "../controllers/screening.controller";
+import {
   createJobSchema,
   updateJobSchema,
   applyToJobSchema,
@@ -29,5 +33,7 @@ router.get("/:id/applications", authenticate, getJobApplicationsHandler);
 router.post("/", authenticate, validate(createJobSchema), createJobHandler);
 router.post("/apply", authenticate, validate(applyToJobSchema), applyToJobHandler);
 router.patch("/applications/status", authenticate, validate(updateApplicationStatusSchema), updateApplicationStatusHandler);
+router.post("/applications/:id/screen", authenticate, screenApplicationHandler);
+router.get("/applications/:id/screen", authenticate, getApplicationScreeningHandler);
 
 export default router;

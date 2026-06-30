@@ -71,3 +71,27 @@ export function useMyApplications() {
     },
   });
 }
+
+export function useJobApplications(jobId: string) {
+  return useQuery({
+    queryKey: ["jobs", jobId, "applications"],
+    queryFn: async () => {
+      const res = await api.get(`/api/jobs/${jobId}/applications`);
+      return res.data.data;
+    },
+    enabled: !!jobId,
+  });
+}
+
+export function useScreenApplication() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (applicationId: string) => {
+      const res = await api.post(`/api/jobs/applications/${applicationId}/screen`);
+      return res.data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["applications"] });
+    },
+  });
+}
