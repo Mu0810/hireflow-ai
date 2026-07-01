@@ -194,7 +194,7 @@ export async function getMySubmissions(userId: string, jobId: string) {
   return prisma.codingSubmission.findMany({
     where: { candidateId: userId, test: { jobId } },
     include: { test: { select: { id: true, title: true } } },
-    orderBy: { createdAt: "desc" },
+    orderBy: { startedAt: "desc" },
   });
 }
 
@@ -219,6 +219,6 @@ export async function getTestSubmissions(userId: string, testId: string) {
   return prisma.codingSubmission.findMany({
     where: { testId },
     include: { candidate: { select: { id: true, name: true, email: true } } },
-    orderBy: { createdAt: "desc" },
+    orderBy: { startedAt: "desc" },
   });
 }

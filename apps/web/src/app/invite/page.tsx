@@ -9,7 +9,7 @@ function InviteContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
-  const acceptInvite = useAcceptInvite();
+  const { mutateAsync: acceptInvite } = useAcceptInvite();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 
@@ -20,8 +20,7 @@ function InviteContent() {
       return;
     }
 
-    acceptInvite
-      .mutateAsync(token)
+    acceptInvite(token)
       .then(() => {
         setStatus("success");
         setMessage("You've joined the company. Redirecting to dashboard...");
@@ -31,7 +30,7 @@ function InviteContent() {
         setStatus("error");
         setMessage(err.response?.data?.error || "Failed to accept invite");
       });
-  }, [token, router]);
+  }, [token, router, acceptInvite]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

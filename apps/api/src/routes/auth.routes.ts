@@ -43,9 +43,9 @@ function setRefreshCookie(res: any, token: string) {
 }
 
 async function oauthCallback(req: any, res: any) {
-  const user = req.user as any;
+  const user = req.user as { userId: string; email: string; role: string };
   const payload = {
-    userId: user.id,
+    userId: user.userId,
     email: user.email,
     role: user.role,
   };
@@ -54,7 +54,7 @@ async function oauthCallback(req: any, res: any) {
 
   await prisma.session.create({
     data: {
-      userId: user.id,
+      userId: user.userId,
       refreshToken,
       expiresAt: new Date(Date.now() + REFRESH_COOKIE_MAX_AGE),
     },

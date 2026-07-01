@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { env } from "../config/env";
 
 export interface TokenPayload {
@@ -7,16 +7,22 @@ export interface TokenPayload {
   role: string;
 }
 
+// `expiresIn` comes from env as a plain string (e.g. "15m"), while
+// @types/jsonwebtoken expects the narrower `number | StringValue` type.
+const accessTokenOptions: SignOptions = {
+  expiresIn: env.JWT_ACCESS_EXPIRES_IN as SignOptions["expiresIn"],
+};
+
+const refreshTokenOptions: SignOptions = {
+  expiresIn: env.JWT_REFRESH_EXPIRES_IN as SignOptions["expiresIn"],
+};
+
 export function generateAccessToken(payload: TokenPayload): string {
-  return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-    expiresIn: env.JWT_ACCESS_EXPIRES_IN,
-  });
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, accessTokenOptions);
 }
 
 export function generateRefreshToken(payload: TokenPayload): string {
-  return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-    expiresIn: env.JWT_REFRESH_EXPIRES_IN,
-  });
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET, refreshTokenOptions);
 }
 
 export function verifyAccessToken(token: string): TokenPayload {

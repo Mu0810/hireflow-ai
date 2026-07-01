@@ -62,7 +62,7 @@ export async function getAdminAnalytics(userId: string) {
     where: { id: userId },
   });
 
-  if (!user || user.role !== "ADMIN") {
+  if (!user || user.role !== "SUPER_ADMIN") {
     throw new Error("Access denied");
   }
 
