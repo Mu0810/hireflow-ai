@@ -34,7 +34,7 @@ function InviteContent() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md rounded-lg border p-8 text-center shadow">
+      <div className="w-full max-w-md rounded-lg border p-8 text-center shadow-sm">
         <h1 className="text-2xl font-bold">
           {status === "loading" ? "Accepting invite..." : status === "success" ? "Welcome!" : "Error"}
         </h1>

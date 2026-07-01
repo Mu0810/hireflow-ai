@@ -167,7 +167,7 @@ export default function ProfilePage() {
         {error && <p className="rounded-lg bg-red-100 p-3 text-red-800">{error}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Basic info</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
@@ -218,7 +218,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Skills</h2>
             <div className="mt-4 space-y-3">
               {skillFields.fields.map((field, index) => (
@@ -248,7 +248,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Education</h2>
             <div className="mt-4 space-y-4">
               {educationFields.fields.map((field, index) => (
@@ -272,7 +272,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Experience</h2>
             <div className="mt-4 space-y-4">
               {experienceFields.fields.map((field, index) => (
@@ -301,7 +301,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Projects</h2>
             <div className="mt-4 space-y-4">
               {projectFields.fields.map((field, index) => (
@@ -330,7 +330,7 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          <section className="rounded-lg border p-6 shadow">
+          <section className="rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-bold">Certifications</h2>
             <div className="mt-4 space-y-4">
               {certificationFields.fields.map((field, index) => (

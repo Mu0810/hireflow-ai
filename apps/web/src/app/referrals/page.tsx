@@ -54,7 +54,7 @@ export default function ReferralsPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-bold">Referrals</h1>
 
-        <div className="mt-6 rounded-lg border p-6 shadow">
+        <div className="mt-6 rounded-lg border p-6 shadow-sm">
           <h2 className="text-xl font-bold">Submit a referral</h2>
           {success && <p className="mt-2 text-green-600">Referral submitted!</p>}
           {error && <p className="mt-2 text-red-600">{error}</p>}

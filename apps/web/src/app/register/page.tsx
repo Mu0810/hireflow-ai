@@ -36,7 +36,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="w-full max-w-md rounded-lg border p-8 text-center shadow">
+        <div className="w-full max-w-md rounded-lg border p-8 text-center shadow-sm">
           <h1 className="text-2xl font-bold">Check your email</h1>
           <p className="mt-2 text-muted-foreground">
             We sent a verification link to your email.
@@ -48,7 +48,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow">
+      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow-sm">
         <h1 className="text-2xl font-bold">Create an account</h1>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

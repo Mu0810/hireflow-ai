@@ -53,7 +53,7 @@ export default function DashboardPage() {
       <p className="mt-4">Welcome, {user?.name || user?.email}</p>
       <p className="text-sm text-muted-foreground">Role: {user?.role}</p>
 
-      <div className="mt-8 rounded-lg border p-6 shadow">
+      <div className="mt-8 rounded-lg border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Your companies</h2>
           <Link href="/companies/new">

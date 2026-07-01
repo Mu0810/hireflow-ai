@@ -42,7 +42,7 @@ function ResetPasswordContent() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="w-full max-w-md rounded-lg border p-8 text-center shadow">
+        <div className="w-full max-w-md rounded-lg border p-8 text-center shadow-sm">
           <h1 className="text-2xl font-bold">Password reset</h1>
           <p className="mt-2 text-muted-foreground">Your password has been updated.</p>
           <Link href="/login" className="mt-4 inline-block text-primary underline">
@@ -55,7 +55,7 @@ function ResetPasswordContent() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow">
+      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow-sm">
         <h1 className="text-2xl font-bold">Reset password</h1>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

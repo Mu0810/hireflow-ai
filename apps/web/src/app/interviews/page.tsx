@@ -19,7 +19,7 @@ export default function InterviewsPage() {
           <Link
             key={interview.id}
             href={`/interviews/${interview.id}`}
-            className="block rounded-lg border p-6 shadow transition-colors hover:bg-muted"
+            className="block rounded-lg border p-6 shadow-sm transition-colors hover:bg-muted"
           >
             <div className="flex items-center justify-between">
               <div>

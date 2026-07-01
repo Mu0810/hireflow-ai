@@ -35,7 +35,7 @@ export default function NewCompanyPage() {
 
   return (
     <div className="p-8">
-      <div className="mx-auto max-w-xl rounded-lg border p-6 shadow">
+      <div className="mx-auto max-w-xl rounded-lg border p-6 shadow-sm">
         <h1 className="text-2xl font-bold">Create a company</h1>
         {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-4 space-y-4">

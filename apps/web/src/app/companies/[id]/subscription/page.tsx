@@ -31,7 +31,7 @@ export default function CompanySubscriptionPage() {
       <div className="mx-auto max-w-2xl">
         <h1 className="text-3xl font-bold">Subscription</h1>
 
-        <div className="mt-6 rounded-lg border p-6 shadow">
+        <div className="mt-6 rounded-lg border p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-muted-foreground">Current plan</p>

@@ -74,7 +74,7 @@ export default function CompanyDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-lg border p-6 shadow">
+      <div className="mt-8 rounded-lg border p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Open positions</h2>
           <Link href={`/companies/${id}/jobs/new`}>
@@ -116,7 +116,7 @@ export default function CompanyDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-lg border p-6 shadow">
+      <div className="mt-8 rounded-lg border p-6 shadow-sm">
         <h2 className="text-xl font-bold">Team members</h2>
         <div className="mt-4 space-y-2">
           {company.members?.map((member: any) => (
@@ -133,7 +133,7 @@ export default function CompanyDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8 rounded-lg border p-6 shadow">
+      <div className="mt-8 rounded-lg border p-6 shadow-sm">
         <h2 className="text-xl font-bold">Invite a team member</h2>
         {inviteSuccess && <p className="mt-2 text-sm text-green-600">Invitation sent</p>}
         {inviteError && <p className="mt-2 text-sm text-red-500">{inviteError}</p>}

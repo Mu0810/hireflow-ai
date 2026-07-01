@@ -40,7 +40,7 @@ export default function JobApplicationsPage() {
 
       <div className="mt-6 space-y-4">
         {applications?.map((app: any) => (
-          <div key={app.id} className="rounded-lg border p-6 shadow">
+          <div key={app.id} className="rounded-lg border p-6 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-lg font-bold">{app.candidate.name || app.candidate.email}</h2>

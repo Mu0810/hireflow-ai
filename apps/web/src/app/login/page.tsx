@@ -40,7 +40,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow">
+      <div className="w-full max-w-md space-y-6 rounded-lg border p-8 shadow-sm">
         <h1 className="text-2xl font-bold">Sign in to HireFlow AI</h1>
         {error && <p className="text-sm text-red-500">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
