@@ -3,7 +3,7 @@ import { screenApplication, getApplicationScreening } from "../services/screenin
 
 export async function screenApplicationHandler(req: Request, res: Response) {
   try {
-    const application = await screenApplication(req.user!.userId, req.params.id);
+    const application = await screenApplication(req.user!.userId, req.params.id as string);
     return res.json({ data: application });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to screen application";
@@ -13,7 +13,7 @@ export async function screenApplicationHandler(req: Request, res: Response) {
 
 export async function getApplicationScreeningHandler(req: Request, res: Response) {
   try {
-    const screening = await getApplicationScreening(req.user!.userId, req.params.id);
+    const screening = await getApplicationScreening(req.user!.userId, req.params.id as string);
     return res.json({ data: screening });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch screening";

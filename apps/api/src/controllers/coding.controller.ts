@@ -21,7 +21,7 @@ export async function createCodingTestHandler(req: Request, res: Response) {
 
 export async function getJobCodingTestsHandler(req: Request, res: Response) {
   try {
-    const tests = await getJobCodingTests(req.user!.userId, req.params.jobId);
+    const tests = await getJobCodingTests(req.user!.userId, req.params.jobId as string);
     return res.json({ data: tests });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch tests";
@@ -31,7 +31,7 @@ export async function getJobCodingTestsHandler(req: Request, res: Response) {
 
 export async function getCodingTestHandler(req: Request, res: Response) {
   try {
-    const test = await getCodingTest(req.user!.userId, req.params.id);
+    const test = await getCodingTest(req.user!.userId, req.params.id as string);
     return res.json({ data: test });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch test";
@@ -41,7 +41,7 @@ export async function getCodingTestHandler(req: Request, res: Response) {
 
 export async function startSubmissionHandler(req: Request, res: Response) {
   try {
-    const submission = await startSubmission(req.user!.userId, req.params.id);
+    const submission = await startSubmission(req.user!.userId, req.params.id as string);
     return res.json({ data: submission });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to start test";
@@ -61,7 +61,7 @@ export async function submitCodingTestHandler(req: Request, res: Response) {
 
 export async function getMySubmissionsHandler(req: Request, res: Response) {
   try {
-    const submissions = await getMySubmissions(req.user!.userId, req.params.jobId);
+    const submissions = await getMySubmissions(req.user!.userId, req.params.jobId as string);
     return res.json({ data: submissions });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch submissions";
@@ -71,7 +71,7 @@ export async function getMySubmissionsHandler(req: Request, res: Response) {
 
 export async function getTestSubmissionsHandler(req: Request, res: Response) {
   try {
-    const submissions = await getTestSubmissions(req.user!.userId, req.params.id);
+    const submissions = await getTestSubmissions(req.user!.userId, req.params.id as string);
     return res.json({ data: submissions });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch submissions";

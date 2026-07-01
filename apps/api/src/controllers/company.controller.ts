@@ -33,7 +33,7 @@ export async function getMyCompaniesHandler(req: Request, res: Response) {
 
 export async function getCompanyHandler(req: Request, res: Response) {
   try {
-    const company = await getCompanyById(req.params.id, req.user!.userId);
+    const company = await getCompanyById(req.params.id as string, req.user!.userId);
     return res.json({ data: company });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch company";
@@ -43,7 +43,7 @@ export async function getCompanyHandler(req: Request, res: Response) {
 
 export async function updateCompanyHandler(req: Request, res: Response) {
   try {
-    const company = await updateCompany(req.params.id, req.user!.userId, req.body);
+    const company = await updateCompany(req.params.id as string, req.user!.userId, req.body);
     return res.json({ data: company });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update company";
@@ -53,7 +53,7 @@ export async function updateCompanyHandler(req: Request, res: Response) {
 
 export async function inviteMemberHandler(req: Request, res: Response) {
   try {
-    await inviteMember(req.params.id, req.user!.userId, req.body);
+    await inviteMember(req.params.id as string, req.user!.userId, req.body);
     return res.json({ message: "Invitation sent" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to send invite";
@@ -73,7 +73,7 @@ export async function acceptInviteHandler(req: Request, res: Response) {
 
 export async function removeMemberHandler(req: Request, res: Response) {
   try {
-    await removeMember(req.params.id, req.params.memberId, req.user!.userId);
+    await removeMember(req.params.id as string, req.params.memberId as string, req.user!.userId);
     return res.json({ message: "Member removed" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to remove member";
@@ -83,7 +83,7 @@ export async function removeMemberHandler(req: Request, res: Response) {
 
 export async function updateMemberRoleHandler(req: Request, res: Response) {
   try {
-    await updateMemberRole(req.params.id, req.user!.userId, req.body.memberId, req.body.role as CompanyMemberRole);
+    await updateMemberRole(req.params.id as string, req.user!.userId, req.body.memberId, req.body.role as CompanyMemberRole);
     return res.json({ message: "Role updated" });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update role";

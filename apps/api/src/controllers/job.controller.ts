@@ -24,7 +24,7 @@ export async function createJobHandler(req: Request, res: Response) {
 
 export async function getCompanyJobsHandler(req: Request, res: Response) {
   try {
-    const jobs = await getCompanyJobs(req.params.companyId, req.user!.userId);
+    const jobs = await getCompanyJobs(req.params.companyId as string, req.user!.userId);
     return res.json({ data: jobs });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch jobs";
@@ -44,7 +44,7 @@ export async function getOpenJobsHandler(_req: Request, res: Response) {
 
 export async function getJobHandler(req: Request, res: Response) {
   try {
-    const job = await getJobById(req.params.id, req.user?.userId);
+    const job = await getJobById(req.params.id as string, req.user?.userId);
     return res.json({ data: job });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch job";
@@ -54,7 +54,7 @@ export async function getJobHandler(req: Request, res: Response) {
 
 export async function updateJobHandler(req: Request, res: Response) {
   try {
-    const job = await updateJob(req.user!.userId, req.params.id, req.body);
+    const job = await updateJob(req.user!.userId, req.params.id as string, req.body);
     return res.json({ data: job });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update job";
@@ -84,7 +84,7 @@ export async function getMyApplicationsHandler(req: Request, res: Response) {
 
 export async function getJobApplicationsHandler(req: Request, res: Response) {
   try {
-    const applications = await getJobApplications(req.user!.userId, req.params.id);
+    const applications = await getJobApplications(req.user!.userId, req.params.id as string);
     return res.json({ data: applications });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch applications";

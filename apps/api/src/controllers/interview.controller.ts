@@ -19,7 +19,7 @@ export async function createInterviewHandler(req: Request, res: Response) {
 
 export async function getInterviewHandler(req: Request, res: Response) {
   try {
-    const interview = await getInterview(req.user!.userId, req.params.id);
+    const interview = await getInterview(req.user!.userId, req.params.id as string);
     return res.json({ data: interview });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch interview";
@@ -39,7 +39,7 @@ export async function getMyInterviewsHandler(req: Request, res: Response) {
 
 export async function updateInterviewHandler(req: Request, res: Response) {
   try {
-    const interview = await updateInterview(req.user!.userId, req.params.id, req.body);
+    const interview = await updateInterview(req.user!.userId, req.params.id as string, req.body);
     return res.json({ data: interview });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update interview";

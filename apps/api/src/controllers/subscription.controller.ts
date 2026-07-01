@@ -10,7 +10,7 @@ import {
 
 export async function getCompanySubscriptionHandler(req: Request, res: Response) {
   try {
-    const subscription = await getCompanySubscription(req.user!.userId, req.params.companyId);
+    const subscription = await getCompanySubscription(req.user!.userId, req.params.companyId as string);
     return res.json({ data: subscription });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch subscription";
@@ -22,7 +22,7 @@ export async function updateCompanySubscriptionHandler(req: Request, res: Respon
   try {
     const subscription = await updateCompanySubscription(
       req.user!.userId,
-      req.params.companyId,
+      req.params.companyId as string,
       req.body
     );
     return res.json({ data: subscription });
@@ -54,7 +54,7 @@ export async function getMyReferralsHandler(req: Request, res: Response) {
 
 export async function getCompanyReferralsHandler(req: Request, res: Response) {
   try {
-    const referrals = await getCompanyReferrals(req.user!.userId, req.params.companyId);
+    const referrals = await getCompanyReferrals(req.user!.userId, req.params.companyId as string);
     return res.json({ data: referrals });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to fetch referrals";
@@ -64,7 +64,7 @@ export async function getCompanyReferralsHandler(req: Request, res: Response) {
 
 export async function updateReferralHandler(req: Request, res: Response) {
   try {
-    const referral = await updateReferral(req.user!.userId, req.params.id, req.body);
+    const referral = await updateReferral(req.user!.userId, req.params.id as string, req.body);
     return res.json({ data: referral });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update referral";

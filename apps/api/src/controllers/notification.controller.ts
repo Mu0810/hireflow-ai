@@ -28,7 +28,7 @@ export async function getUnreadNotificationsHandler(req: Request, res: Response)
 
 export async function markNotificationReadHandler(req: Request, res: Response) {
   try {
-    const notification = await markNotificationRead(req.user!.userId, req.params.id);
+    const notification = await markNotificationRead(req.user!.userId, req.params.id as string);
     return res.json({ data: notification });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to mark notification read";

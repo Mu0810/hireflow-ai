@@ -21,7 +21,7 @@ import subscriptionRoutes from "./routes/subscription.routes";
 const app = express();
 
 app.use(helmet());
-app.use(passport.initialize());
+app.use(passport.initialize() as unknown as express.RequestHandler);
 app.use(morgan("dev"));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
