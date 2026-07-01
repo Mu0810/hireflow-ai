@@ -1,15 +1,15 @@
 import { beforeAll, afterAll } from "vitest";
-import { execSync } from "child_process";
+import { execSync } from "node:child_process";
+import path from "node:path";
 import { prisma } from "../config/db";
 import { cleanDatabase } from "./helpers";
 
 beforeAll(async () => {
-  process.env.NODE_ENV = "test";
-  process.env.DATABASE_URL = "postgresql://hireflow:hireflow@localhost:5432/hireflow_test?schema=public";
-  process.env.JWT_ACCESS_SECRET = "test-access-secret-32-chars-long!!";
-  process.env.JWT_REFRESH_SECRET = "test-refresh-secret-32-chars-long!";
-
-  execSync("pnpm prisma migrate deploy --schema=../../prisma/schema.prisma", { stdio: "inherit" });
+  // DATABASE_URL and JWT secrets are provided via vitest `test.env` so they are
+  // set before the Prisma client is constructed at import time.
+  // Migrations run from the repo root so Prisma 7 can locate prisma.config.ts.
+  const repoRoot = path.resolve(process.cwd(), "../..");
+  execSync("pnpm prisma migrate deploy", { cwd: repoRoot, stdio: "inherit" });
   await cleanDatabase();
 });
 

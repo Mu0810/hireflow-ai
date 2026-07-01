@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@hireflow/shared": "workspace:*",
-    "@prisma/client": "^5.10.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -26,6 +27,7 @@
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "passport-google-oauth20": "^2.0.0",
+    "pg": "^8.22.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -39,6 +41,7 @@
     "@types/passport": "^1.0.16",
     "@types/passport-github2": "^1.2.9",
     "@types/passport-google-oauth20": "^2.0.14",
+    "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
     "supertest": "^7.2.2",
     "tsx": "^4.7.0",
