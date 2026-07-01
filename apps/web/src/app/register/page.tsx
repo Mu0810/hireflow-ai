@@ -36,11 +36,18 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="w-full max-w-md rounded-lg border p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-bold">Check your email</h1>
-          <p className="mt-2 text-muted-foreground">
-            We sent a verification link to your email.
+        <div className="w-full max-w-md space-y-4 rounded-lg border p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-bold">Account created</h1>
+          <p className="text-muted-foreground">
+            You can now sign in. If email verification is enabled, check your inbox
+            for a verification link first.
           </p>
+          <Link
+            href="/login"
+            className="inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Continue to sign in
+          </Link>
         </div>
       </div>
     );
