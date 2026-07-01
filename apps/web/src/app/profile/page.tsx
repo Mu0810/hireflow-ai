@@ -71,7 +71,7 @@ export default function ProfilePage() {
     control,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<UpdateProfileInput>({
+  } = useForm({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
       bio: "",

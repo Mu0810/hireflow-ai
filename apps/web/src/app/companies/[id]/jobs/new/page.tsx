@@ -23,7 +23,7 @@ export default function NewJobPage() {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<CreateJobInput>({
+  } = useForm({
     resolver: zodResolver(createJobSchema),
     defaultValues: {
       title: "",

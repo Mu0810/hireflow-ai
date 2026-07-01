@@ -26,7 +26,7 @@ export default function CompanyDetailPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<InviteMemberInput>({
+  } = useForm({
     resolver: zodResolver(inviteMemberSchema),
   });
 

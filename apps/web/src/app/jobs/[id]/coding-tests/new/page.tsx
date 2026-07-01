@@ -21,7 +21,7 @@ export default function NewCodingTestPage() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<CreateCodingTestInput>({
+  } = useForm({
     resolver: zodResolver(createCodingTestSchema),
     defaultValues: {
       jobId,
