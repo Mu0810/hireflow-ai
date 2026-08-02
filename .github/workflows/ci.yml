@@ -41,6 +41,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # @hireflow/shared is consumed through its built dist/ (its package.json
+      # points main/types there). The test step below invokes vitest directly
+      # rather than through `turbo run test`, so turbo's dependsOn: ["^build"]
+      # does not apply and nothing would build it. Without this step every test
+      # file fails to import with "Failed to resolve entry for package
+      # @hireflow/shared" before a single test runs.
+      - name: Build shared package
+        run: pnpm --filter @hireflow/shared build
+
       - name: Set up environment
         run: |
           echo "NODE_ENV=test" >> .env
