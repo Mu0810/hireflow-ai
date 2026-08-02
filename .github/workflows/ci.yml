@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "feature/**"]
+  # No branch filter: run on every pull request regardless of its base.
+  # Previously this was restricted to [main], but the repository's default
+  # branch is feature/hireflow-ai-auth, so no pull request ever triggered CI.
   pull_request:
-    branches: [main]
 
 jobs:
   api-tests:
