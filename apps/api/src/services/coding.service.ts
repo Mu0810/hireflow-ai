@@ -1,7 +1,7 @@
 import { CodingSubmissionStatus } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateCodingTestInput, SubmitCodingTestInput, TestResult } from "@hireflow/shared";
-import { runInNewContext } from "vm";
+import { runJavaScriptTests } from "../utils/sandbox";
 import { ConflictError, ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function createCodingTest(userId: string, input: CreateCodingTestInput) {
@@ -132,23 +132,37 @@ export async function submitCodingTest(userId: string, input: SubmitCodingTestIn
   let passed = 0;
 
   if (submission.test.language === "JAVASCRIPT") {
-    for (const tc of testCases) {
-      try {
-        const sandbox: { result: unknown; input: string; expectedOutput: string } = {
-          result: undefined,
+    // Executed in a separate, environment-stripped, heap-capped process that is
+    // SIGKILLed on timeout. See src/utils/sandbox.ts for why in-process `vm`
+    // evaluation was unsafe.
+    const outcome = await runJavaScriptTests(input.code, testCases);
+
+    if (!outcome.ok) {
+      // A whole-run failure (timeout, no `solution` function, syntax error) is
+      // reported against every case, so the candidate sees a complete result set.
+      for (const tc of testCases) {
+        results.push({
+          passed: false,
           input: tc.input,
           expectedOutput: tc.expectedOutput,
-        };
+          error: outcome.error,
+        });
+      }
+    } else {
+      testCases.forEach((tc: { input: string; expectedOutput: string }, i: number) => {
+        const caseResult = outcome.results[i];
 
-        const code = `
-          ${input.code}
-          const parsedInput = JSON.parse(input);
-          result = solution(parsedInput);
-        `;
+        if (!caseResult || !caseResult.ok) {
+          results.push({
+            passed: false,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput,
+            error: caseResult?.error ?? "No result was produced for this test case.",
+          });
+          return;
+        }
 
-        runInNewContext(code, sandbox, { timeout: 2000 });
-
-        const actualOutput = JSON.stringify(sandbox.result);
+        const actualOutput = caseResult.actualOutput;
         const isPass = actualOutput === tc.expectedOutput;
         if (isPass) passed++;
 
@@ -158,14 +172,7 @@ export async function submitCodingTest(userId: string, input: SubmitCodingTestIn
           expectedOutput: tc.expectedOutput,
           actualOutput,
         });
-      } catch (err: any) {
-        results.push({
-          passed: false,
-          input: tc.input,
-          expectedOutput: tc.expectedOutput,
-          error: err.message,
-        });
-      }
+      });
     }
   } else {
     results.push({

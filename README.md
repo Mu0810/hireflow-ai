@@ -65,6 +65,10 @@ package of types and Zod schemas consumed by both, over PostgreSQL via Prisma 7.
 - Recruiters attach coding tests with JSON test cases to a job
 - Candidates start and submit; submissions are graded against expected output and scored
 - One submission per candidate per test, enforced by a composite unique key
+- Submitted JavaScript executes in a separate process with **no inherited environment**, a capped
+  heap, and a wall-clock SIGKILL, so an infinite loop, an allocation bomb, or a `process.exit()` in
+  submitted code cannot affect the API. See [Known limitations](#known-limitations) for what this
+  does and does not protect against.
 
 **Interviews, messaging, notifications**
 - Phone/video/in-person interviews attached to an application, with scheduling and status
@@ -353,11 +357,13 @@ CI does not currently run `build` or `lint`, and there is no job for the web app
 
 Honest inventory of what is unfinished or unsafe. None of this is hidden behind a green badge.
 
-1. **Coding submissions are not securely sandboxed.** `coding.service.ts` evaluates candidate
-   JavaScript with `vm.runInNewContext(...)` and a 2-second timeout. Node's `vm` module is
-   explicitly *not* a security boundary — submitted code runs in the API process. This is acceptable
-   for local development only. A public deployment needs an isolated runtime (a container per
-   submission, `isolated-vm`, or a hosted execution service).
+1. **Coding submissions are contained, but not fully isolated.** Candidate code runs in a separate
+   process with no inherited environment, a capped heap, and a hard SIGKILL timeout
+   (`src/utils/sandbox.ts`), so an escape reaches no secrets and cannot take the API down. It is
+   still the same OS user on the same host, so submitted code can open network connections and read
+   files that user can read. Genuinely untrusted input needs OS-level isolation — a container per
+   submission, gVisor, seccomp, or a hosted execution service. `sandbox.ts` is the seam where that
+   swaps in without changing callers.
 2. **Only JavaScript is graded.** `PYTHON` and `TYPESCRIPT` are valid `CodingLanguage` values but
    return `"Language not supported yet"`.
 3. **Screening is a heuristic, not AI.** The repository name says `hireflow-ai`; the scoring is the
