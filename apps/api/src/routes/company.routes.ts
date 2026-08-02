@@ -11,6 +11,7 @@ import {
   removeMemberHandler,
   updateMemberRoleHandler,
 } from "../controllers/company.controller";
+import { getCompanyJobsHandler } from "../controllers/job.controller";
 import {
   createCompanySchema,
   updateCompanySchema,
@@ -25,6 +26,9 @@ router.post("/", authenticate, validate(createCompanySchema), createCompanyHandl
 router.get("/my", authenticate, getMyCompaniesHandler);
 router.get("/:id", authenticate, getCompanyHandler);
 router.patch("/:id", authenticate, validate(updateCompanySchema), updateCompanyHandler);
+// The web client (apps/web/src/hooks/use-jobs.ts) calls this endpoint, and the
+// handler reads req.params.companyId, so the param must be named :companyId.
+router.get("/:companyId/jobs", authenticate, getCompanyJobsHandler);
 router.post("/:id/invite", authenticate, validate(inviteMemberSchema), inviteMemberHandler);
 router.post("/accept-invite", authenticate, validate(acceptInviteSchema), acceptInviteHandler);
 router.delete("/:id/members/:memberId", authenticate, removeMemberHandler);

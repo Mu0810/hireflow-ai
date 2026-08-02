@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// NOTE: "/" is deliberately NOT in this list. It is handled as an exact match
+// below, because `pathname.startsWith("/")` is true for every possible route
+// and would silently make the entire app public.
 const publicPaths = [
-  "/",
   "/login",
   "/register",
   "/verify-email",
@@ -11,11 +13,16 @@ const publicPaths = [
   "/auth/callback",
 ];
 
+function isPublicPath(pathname: string): boolean {
+  if (pathname === "/") return true;
+  return publicPaths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get("accessToken")?.value;
 
-  if (publicPaths.some((p) => pathname.startsWith(p))) {
+  if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
