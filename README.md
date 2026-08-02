@@ -22,7 +22,6 @@ package of types and Zod schemas consumed by both, over PostgreSQL via Prisma 7.
 - [Testing](#testing)
 - [Continuous integration](#continuous-integration)
 - [Known limitations](#known-limitations)
-- [Repository scope](#repository-scope)
 
 ---
 
@@ -103,8 +102,7 @@ hireflow-ai/
 │           └── middleware.ts   cookie-based route guard
 ├── packages/
 │   └── shared/                 @hireflow/shared — types + Zod schemas for 7 domains
-├── prisma/                     schema (25 models), 9 migrations, seed
-└── jarvis/                     unrelated Python prototype — see Repository scope
+└── prisma/                     schema (25 models), 9 migrations, seed
 ```
 
 **Request flow:** `route → middleware (authenticate / validate) → controller → service → Prisma`.
@@ -356,20 +354,3 @@ Honest inventory of what is unfinished or unsafe. None of this is hidden behind 
 10. **Redis is declared in `docker-compose.yml` but unused** by application code.
 11. **Shared types are hand-maintained,** not generated from `schema.prisma`, so they can drift.
 12. **`express-validator` is a dependency but never imported;** all validation goes through Zod.
-
----
-
-## Repository scope
-
-`jarvis/` is a **separate, unrelated Python prototype** — an experimental desktop assistant whose
-tools generate Unity, Android Studio, and macOS scaffolding. It shares no code, database, or purpose
-with the ATS.
-
-It is also **incomplete and does not currently run.** Several modules its own code imports
-(`jarvis.core`, `jarvis.logging`, `jarvis.memory`, `jarvis.voice`, `jarvis.api`, and others) are not
-present in the tree, so `container.py` and the CLI fail at import time and the Python test suite
-cannot be collected. `pyproject.toml` additionally declares optional voice, Discord, and Slack
-extras that have no corresponding implementation.
-
-Treat everything under `jarvis/` as an unfinished experiment parked in this repository, not as part
-of HireFlow. It should eventually move to its own repository.
