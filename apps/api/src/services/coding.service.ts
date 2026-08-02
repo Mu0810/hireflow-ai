@@ -2,6 +2,7 @@ import { CodingSubmissionStatus } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateCodingTestInput, SubmitCodingTestInput, TestResult } from "@hireflow/shared";
 import { runInNewContext } from "vm";
+import { ConflictError, ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function createCodingTest(userId: string, input: CreateCodingTestInput) {
   const job = await prisma.job.findUnique({
@@ -9,7 +10,7 @@ export async function createCodingTest(userId: string, input: CreateCodingTestIn
   });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new NotFoundError("Job not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -21,7 +22,7 @@ export async function createCodingTest(userId: string, input: CreateCodingTestIn
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.codingTest.create({
@@ -44,7 +45,7 @@ export async function getJobCodingTests(userId: string, jobId: string) {
   });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new NotFoundError("Job not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -52,7 +53,7 @@ export async function getJobCodingTests(userId: string, jobId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.codingTest.findMany({
@@ -68,7 +69,7 @@ export async function getCodingTest(userId: string, testId: string) {
   });
 
   if (!test) {
-    throw new Error("Test not found");
+    throw new NotFoundError("Test not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -76,7 +77,7 @@ export async function getCodingTest(userId: string, testId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return {
@@ -92,7 +93,7 @@ export async function startSubmission(userId: string, testId: string) {
   });
 
   if (!test) {
-    throw new Error("Test not found");
+    throw new NotFoundError("Test not found");
   }
 
   const existing = await prisma.codingSubmission.findUnique({
@@ -119,11 +120,11 @@ export async function submitCodingTest(userId: string, input: SubmitCodingTestIn
   });
 
   if (!submission) {
-    throw new Error("Submission not found");
+    throw new NotFoundError("Submission not found");
   }
 
   if (submission.submittedAt) {
-    throw new Error("Test already submitted");
+    throw new ConflictError("Test already submitted");
   }
 
   const testCases = JSON.parse(submission.test.language === "JAVASCRIPT" ? submission.test.testCases : "[]");
@@ -205,7 +206,7 @@ export async function getTestSubmissions(userId: string, testId: string) {
   });
 
   if (!test) {
-    throw new Error("Test not found");
+    throw new NotFoundError("Test not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -213,7 +214,7 @@ export async function getTestSubmissions(userId: string, testId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.codingSubmission.findMany({

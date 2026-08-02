@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { sendError } from "../utils/http";
 import {
   getMyNotifications,
   getUnreadNotifications,
@@ -11,8 +12,7 @@ export async function getMyNotificationsHandler(req: Request, res: Response) {
     const notifications = await getMyNotifications(req.user!.userId);
     return res.json({ data: notifications });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch notifications";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch notifications");
   }
 }
 
@@ -21,8 +21,7 @@ export async function getUnreadNotificationsHandler(req: Request, res: Response)
     const notifications = await getUnreadNotifications(req.user!.userId);
     return res.json({ data: notifications });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch notifications";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch notifications");
   }
 }
 
@@ -31,8 +30,7 @@ export async function markNotificationReadHandler(req: Request, res: Response) {
     const notification = await markNotificationRead(req.user!.userId, req.params.id as string);
     return res.json({ data: notification });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to mark notification read";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to mark notification read");
   }
 }
 
@@ -41,7 +39,6 @@ export async function markAllNotificationsReadHandler(req: Request, res: Respons
     await markAllNotificationsRead(req.user!.userId);
     return res.json({ data: { success: true } });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to mark notifications read";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to mark notifications read");
   }
 }

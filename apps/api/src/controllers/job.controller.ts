@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { sendError } from "../utils/http";
 import { ApplicationStatus } from "@prisma/client";
 import {
   createJob,
@@ -17,8 +18,7 @@ export async function createJobHandler(req: Request, res: Response) {
     const job = await createJob(req.user!.userId, req.body);
     return res.status(201).json({ data: job });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to create job";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to create job");
   }
 }
 
@@ -27,8 +27,7 @@ export async function getCompanyJobsHandler(req: Request, res: Response) {
     const jobs = await getCompanyJobs(req.params.companyId as string, req.user!.userId);
     return res.json({ data: jobs });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch jobs";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch jobs");
   }
 }
 
@@ -37,8 +36,7 @@ export async function getOpenJobsHandler(_req: Request, res: Response) {
     const jobs = await getOpenJobs();
     return res.json({ data: jobs });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch jobs";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch jobs");
   }
 }
 
@@ -47,8 +45,7 @@ export async function getJobHandler(req: Request, res: Response) {
     const job = await getJobById(req.params.id as string, req.user?.userId);
     return res.json({ data: job });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch job";
-    return res.status(404).json({ error: message });
+    return sendError(res, error, "Failed to fetch job", 404);
   }
 }
 
@@ -57,8 +54,7 @@ export async function updateJobHandler(req: Request, res: Response) {
     const job = await updateJob(req.user!.userId, req.params.id as string, req.body);
     return res.json({ data: job });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to update job";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to update job");
   }
 }
 
@@ -67,8 +63,7 @@ export async function applyToJobHandler(req: Request, res: Response) {
     const application = await applyToJob(req.user!.userId, req.body);
     return res.status(201).json({ data: application });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to apply";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to apply");
   }
 }
 
@@ -77,8 +72,7 @@ export async function getMyApplicationsHandler(req: Request, res: Response) {
     const applications = await getMyApplications(req.user!.userId);
     return res.json({ data: applications });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch applications";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch applications");
   }
 }
 
@@ -87,8 +81,7 @@ export async function getJobApplicationsHandler(req: Request, res: Response) {
     const applications = await getJobApplications(req.user!.userId, req.params.id as string);
     return res.json({ data: applications });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch applications";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch applications");
   }
 }
 
@@ -98,7 +91,6 @@ export async function updateApplicationStatusHandler(req: Request, res: Response
     const application = await updateApplicationStatus(req.user!.userId, applicationId, status as ApplicationStatus);
     return res.json({ data: application });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to update application";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to update application");
   }
 }

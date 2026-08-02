@@ -91,7 +91,9 @@ describe("POST /api/companies", () => {
         slug: "acme-inc",
       });
 
-    expect(res.status).toBe(400);
+    // 409: the slug is taken, which is a state conflict rather than bad input.
+    expect(res.status).toBe(409);
+    expect(res.body.error).toBe("Company slug already taken");
   });
 });
 

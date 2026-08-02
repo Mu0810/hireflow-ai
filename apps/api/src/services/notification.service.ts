@@ -1,5 +1,6 @@
 import { NotificationType } from "@prisma/client";
 import { prisma } from "../config/db";
+import { NotFoundError } from "../utils/errors";
 
 export async function createNotification(
   userId: string,
@@ -37,7 +38,7 @@ export async function markNotificationRead(userId: string, notificationId: strin
   });
 
   if (!notification || notification.userId !== userId) {
-    throw new Error("Notification not found");
+    throw new NotFoundError("Notification not found");
   }
 
   return prisma.notification.update({

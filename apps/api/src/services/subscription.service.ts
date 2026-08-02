@@ -1,5 +1,6 @@
 import { prisma } from "../config/db";
 import { CreateReferralInput, UpdateReferralInput, UpdateSubscriptionInput } from "@hireflow/shared";
+import { ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function getCompanySubscription(userId: string, companyId: string) {
   const member = await prisma.companyMember.findFirst({
@@ -7,7 +8,7 @@ export async function getCompanySubscription(userId: string, companyId: string) 
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.subscription.findUnique({
@@ -25,7 +26,7 @@ export async function updateCompanySubscription(
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.subscription.upsert({
@@ -50,7 +51,7 @@ export async function createReferral(userId: string, input: CreateReferralInput)
   });
 
   if (!company) {
-    throw new Error("Company not found");
+    throw new NotFoundError("Company not found");
   }
 
   if (input.jobId) {
@@ -58,7 +59,7 @@ export async function createReferral(userId: string, input: CreateReferralInput)
       where: { id: input.jobId },
     });
     if (!job || job.companyId !== input.companyId) {
-      throw new Error("Job not found");
+      throw new NotFoundError("Job not found");
     }
   }
 
@@ -91,7 +92,7 @@ export async function getCompanyReferrals(userId: string, companyId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.referral.findMany({
@@ -115,7 +116,7 @@ export async function updateReferral(
   });
 
   if (!referral) {
-    throw new Error("Referral not found");
+    throw new NotFoundError("Referral not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -127,7 +128,7 @@ export async function updateReferral(
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.referral.update({

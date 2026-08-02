@@ -10,6 +10,7 @@ import {
 } from "../utils/tokens";
 import { RegisterInput, LoginInput } from "@hireflow/shared";
 import { env } from "../config/env";
+import { ConflictError, UnauthorizedError } from "../utils/errors";
 
 const VERIFICATION_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
@@ -21,7 +22,7 @@ export async function registerUser(input: RegisterInput) {
   });
 
   if (existing) {
-    throw new Error("Email already registered");
+    throw new ConflictError("Email already registered");
   }
 
   const passwordHash = await hashPassword(input.password);
@@ -67,7 +68,7 @@ export async function verifyEmail(token: string) {
   });
 
   if (!record || record.expiresAt < new Date()) {
-    throw new Error("Invalid or expired token");
+    throw new UnauthorizedError("Invalid or expired token");
   }
 
   await prisma.$transaction([
@@ -89,16 +90,16 @@ export async function loginUser(input: LoginInput) {
   });
 
   if (!user || !user.passwordHash) {
-    throw new Error("Invalid credentials");
+    throw new UnauthorizedError("Invalid credentials");
   }
 
   if (!user.emailVerified) {
-    throw new Error("Please verify your email before logging in");
+    throw new UnauthorizedError("Please verify your email before logging in");
   }
 
   const valid = await verifyPassword(input.password, user.passwordHash);
   if (!valid) {
-    throw new Error("Invalid credentials");
+    throw new UnauthorizedError("Invalid credentials");
   }
 
   const tokenPayload = {
@@ -138,7 +139,7 @@ export async function refreshAccessToken(refreshToken: string) {
   });
 
   if (!session || session.expiresAt < new Date()) {
-    throw new Error("Invalid or expired refresh token");
+    throw new UnauthorizedError("Invalid or expired refresh token");
   }
 
   const payload = verifyRefreshToken(refreshToken);
@@ -195,7 +196,7 @@ export async function resetPassword(token: string, password: string) {
   });
 
   if (!record || record.expiresAt < new Date()) {
-    throw new Error("Invalid or expired token");
+    throw new UnauthorizedError("Invalid or expired token");
   }
 
   const passwordHash = await hashPassword(password);

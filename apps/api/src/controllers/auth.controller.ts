@@ -9,6 +9,7 @@ import {
   resetPassword,
 } from "../services/auth.service";
 import { env } from "../config/env";
+import { sendError } from "../utils/http";
 
 const REFRESH_COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
@@ -29,8 +30,7 @@ export async function register(req: Request, res: Response) {
       data: result,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Registration failed";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Registration failed");
   }
 }
 
@@ -40,8 +40,7 @@ export async function verifyEmailHandler(req: Request, res: Response) {
     await verifyEmail(token);
     return res.json({ message: "Email verified successfully" });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Verification failed";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Verification failed");
   }
 }
 
@@ -57,8 +56,7 @@ export async function login(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Login failed";
-    return res.status(401).json({ error: message });
+    return sendError(res, error, "Login failed", 401);
   }
 }
 
@@ -71,8 +69,7 @@ export async function refresh(req: Request, res: Response) {
     const result = await refreshAccessToken(refreshToken);
     return res.json({ data: result });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Refresh failed";
-    return res.status(401).json({ error: message });
+    return sendError(res, error, "Refresh failed", 401);
   }
 }
 
@@ -85,8 +82,7 @@ export async function logout(req: Request, res: Response) {
     res.clearCookie("refreshToken");
     return res.json({ message: "Logged out successfully" });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Logout failed";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Logout failed");
   }
 }
 
@@ -95,8 +91,7 @@ export async function forgotPasswordHandler(req: Request, res: Response) {
     await forgotPassword(req.body.email);
     return res.json({ message: "If an account exists, a reset email has been sent" });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Request failed";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Request failed");
   }
 }
 
@@ -106,7 +101,6 @@ export async function resetPasswordHandler(req: Request, res: Response) {
     await resetPassword(token, password);
     return res.json({ message: "Password reset successfully" });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Reset failed";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Reset failed");
   }
 }

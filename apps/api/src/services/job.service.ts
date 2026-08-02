@@ -2,6 +2,7 @@ import { ApplicationStatus, JobStatus, NotificationType } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateJobInput, UpdateJobInput, ApplyToJobInput } from "@hireflow/shared";
 import { createNotification } from "./notification.service";
+import { ConflictError, ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function createJob(userId: string, input: CreateJobInput) {
   const member = await prisma.companyMember.findFirst({
@@ -13,7 +14,7 @@ export async function createJob(userId: string, input: CreateJobInput) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const { skills, deadline, ...rest } = input;
@@ -58,7 +59,7 @@ export async function getCompanyJobs(companyId: string, userId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.job.findMany({
@@ -99,7 +100,7 @@ export async function getJobById(jobId: string, userId?: string) {
   });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new NotFoundError("Job not found");
   }
 
   return job;
@@ -111,7 +112,7 @@ export async function updateJob(userId: string, jobId: string, input: UpdateJobI
   });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new NotFoundError("Job not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -123,7 +124,7 @@ export async function updateJob(userId: string, jobId: string, input: UpdateJobI
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const { skills, deadline, ...rest } = input;
@@ -168,7 +169,7 @@ export async function applyToJob(userId: string, input: ApplyToJobInput) {
   });
 
   if (!job || job.status !== JobStatus.OPEN) {
-    throw new Error("Job not available");
+    throw new ConflictError("Job not available");
   }
 
   const existing = await prisma.application.findFirst({
@@ -176,7 +177,7 @@ export async function applyToJob(userId: string, input: ApplyToJobInput) {
   });
 
   if (existing) {
-    throw new Error("You have already applied to this job");
+    throw new ConflictError("You have already applied to this job");
   }
 
   const application = await prisma.application.create({
@@ -220,7 +221,7 @@ export async function getJobApplications(userId: string, jobId: string) {
   });
 
   if (!job) {
-    throw new Error("Job not found");
+    throw new NotFoundError("Job not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -228,7 +229,7 @@ export async function getJobApplications(userId: string, jobId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.application.findMany({
@@ -253,7 +254,7 @@ export async function updateApplicationStatus(
   });
 
   if (!application) {
-    throw new Error("Application not found");
+    throw new NotFoundError("Application not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -265,7 +266,7 @@ export async function updateApplicationStatus(
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const updated = await prisma.application.update({

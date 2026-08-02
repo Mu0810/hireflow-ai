@@ -2,6 +2,7 @@ import { CompanyMemberRole, UserRole } from "@prisma/client";
 import { prisma } from "../config/db";
 import { sendEmail } from "../utils/email";
 import { CreateCompanyInput, InviteMemberInput, UpdateCompanyInput } from "@hireflow/shared";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../utils/errors";
 
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -21,7 +22,7 @@ export async function createCompany(userId: string, input: CreateCompanyInput) {
   });
 
   if (existing) {
-    throw new Error("Company slug already taken");
+    throw new ConflictError("Company slug already taken");
   }
 
   const company = await prisma.$transaction(async (tx) => {
@@ -81,7 +82,7 @@ export async function getCompanyById(companyId: string, userId: string) {
   });
 
   if (!member) {
-    throw new Error("Company not found or access denied");
+    throw new NotFoundError("Company not found or access denied");
   }
 
   const company = await prisma.company.findUnique({
@@ -115,7 +116,7 @@ export async function updateCompany(
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.company.update({
@@ -138,7 +139,7 @@ export async function inviteMember(
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const existingUser = await prisma.user.findUnique({
@@ -150,7 +151,7 @@ export async function inviteMember(
       where: { companyId, userId: existingUser.id },
     });
     if (existingMember) {
-      throw new Error("User is already a member of this company");
+      throw new ConflictError("User is already a member of this company");
     }
   }
 
@@ -167,7 +168,7 @@ export async function inviteMember(
   });
 
   if (!company) {
-    throw new Error("Company not found");
+    throw new NotFoundError("Company not found");
   }
 
   const invite = await prisma.companyInvite.create({
@@ -195,7 +196,7 @@ export async function acceptInvite(token: string, userId: string) {
   });
 
   if (!invite || invite.expiresAt < new Date() || invite.accepted) {
-    throw new Error("Invalid or expired invite");
+    throw new BadRequestError("Invalid or expired invite");
   }
 
   const user = await prisma.user.findUnique({
@@ -203,7 +204,7 @@ export async function acceptInvite(token: string, userId: string) {
   });
 
   if (!user || user.email !== invite.email) {
-    throw new Error("Invite email does not match");
+    throw new ForbiddenError("Invite email does not match");
   }
 
   await prisma.$transaction([
@@ -233,7 +234,7 @@ export async function removeMember(companyId: string, memberId: string, userId: 
   });
 
   if (!actor) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const target = await prisma.companyMember.findUnique({
@@ -241,15 +242,15 @@ export async function removeMember(companyId: string, memberId: string, userId: 
   });
 
   if (!target || target.companyId !== companyId) {
-    throw new Error("Member not found");
+    throw new NotFoundError("Member not found");
   }
 
   if (target.role === CompanyMemberRole.OWNER) {
-    throw new Error("Cannot remove company owner");
+    throw new ForbiddenError("Cannot remove company owner");
   }
 
   if (actor.role === CompanyMemberRole.ADMIN && target.role === CompanyMemberRole.ADMIN) {
-    throw new Error("Admins cannot remove other admins");
+    throw new ForbiddenError("Admins cannot remove other admins");
   }
 
   await prisma.companyMember.delete({
@@ -270,7 +271,7 @@ export async function updateMemberRole(
   });
 
   if (!actor) {
-    throw new Error("Only the owner can change roles");
+    throw new ForbiddenError("Only the owner can change roles");
   }
 
   const target = await prisma.companyMember.findUnique({
@@ -278,11 +279,11 @@ export async function updateMemberRole(
   });
 
   if (!target || target.companyId !== companyId) {
-    throw new Error("Member not found");
+    throw new NotFoundError("Member not found");
   }
 
   if (target.role === CompanyMemberRole.OWNER) {
-    throw new Error("Cannot change owner's role");
+    throw new ForbiddenError("Cannot change owner's role");
   }
 
   await prisma.$transaction([

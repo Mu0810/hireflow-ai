@@ -38,7 +38,8 @@ describe("POST /api/auth/register", () => {
       role: "CANDIDATE",
     });
 
-    expect(res.status).toBe(400);
+    // 409: the request is well-formed, it conflicts with existing state.
+    expect(res.status).toBe(409);
     expect(res.body.error).toBe("Email already registered");
   });
 
