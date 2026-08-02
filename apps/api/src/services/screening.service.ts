@@ -1,4 +1,5 @@
 import { prisma } from "../config/db";
+import { ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function screenApplication(userId: string, applicationId: string) {
   const application = await prisma.application.findUnique({
@@ -10,7 +11,7 @@ export async function screenApplication(userId: string, applicationId: string) {
   });
 
   if (!application) {
-    throw new Error("Application not found");
+    throw new NotFoundError("Application not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -22,7 +23,7 @@ export async function screenApplication(userId: string, applicationId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const requiredSkills = application.job.skills.map((s) => s.skill.name.toLowerCase());
@@ -98,7 +99,7 @@ export async function getApplicationScreening(userId: string, applicationId: str
   });
 
   if (!application) {
-    throw new Error("Application not found");
+    throw new NotFoundError("Application not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -110,7 +111,7 @@ export async function getApplicationScreening(userId: string, applicationId: str
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return {

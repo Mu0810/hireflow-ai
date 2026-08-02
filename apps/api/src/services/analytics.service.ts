@@ -1,4 +1,5 @@
 import { prisma } from "../config/db";
+import { ForbiddenError } from "../utils/errors";
 
 export async function getCompanyAnalytics(userId: string, companyId: string) {
   const member = await prisma.companyMember.findFirst({
@@ -6,7 +7,7 @@ export async function getCompanyAnalytics(userId: string, companyId: string) {
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const [
@@ -63,7 +64,7 @@ export async function getAdminAnalytics(userId: string) {
   });
 
   if (!user || user.role !== "SUPER_ADMIN") {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const [

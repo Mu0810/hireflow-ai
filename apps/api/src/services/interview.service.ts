@@ -2,6 +2,7 @@ import { InterviewStatus, NotificationType } from "@prisma/client";
 import { prisma } from "../config/db";
 import { CreateInterviewInput, UpdateInterviewInput, SendMessageInput } from "@hireflow/shared";
 import { createNotification } from "./notification.service";
+import { ForbiddenError, NotFoundError } from "../utils/errors";
 
 export async function createInterview(userId: string, input: CreateInterviewInput) {
   const application = await prisma.application.findUnique({
@@ -10,7 +11,7 @@ export async function createInterview(userId: string, input: CreateInterviewInpu
   });
 
   if (!application) {
-    throw new Error("Application not found");
+    throw new NotFoundError("Application not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -22,7 +23,7 @@ export async function createInterview(userId: string, input: CreateInterviewInpu
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   const interview = await prisma.interview.create({
@@ -72,7 +73,7 @@ export async function getInterview(userId: string, interviewId: string) {
   });
 
   if (!interview) {
-    throw new Error("Interview not found");
+    throw new NotFoundError("Interview not found");
   }
 
   if (
@@ -83,7 +84,7 @@ export async function getInterview(userId: string, interviewId: string) {
       where: { companyId: interview.application.job.companyId, userId },
     });
     if (!member) {
-      throw new Error("Access denied");
+      throw new ForbiddenError("Access denied");
     }
   }
 
@@ -117,7 +118,7 @@ export async function updateInterview(userId: string, interviewId: string, input
   });
 
   if (!interview) {
-    throw new Error("Interview not found");
+    throw new NotFoundError("Interview not found");
   }
 
   const member = await prisma.companyMember.findFirst({
@@ -129,7 +130,7 @@ export async function updateInterview(userId: string, interviewId: string, input
   });
 
   if (!member) {
-    throw new Error("Access denied");
+    throw new ForbiddenError("Access denied");
   }
 
   return prisma.interview.update({
@@ -151,7 +152,7 @@ export async function sendMessage(userId: string, input: SendMessageInput) {
   });
 
   if (!interview) {
-    throw new Error("Interview not found");
+    throw new NotFoundError("Interview not found");
   }
 
   const isParticipant =
@@ -162,7 +163,7 @@ export async function sendMessage(userId: string, input: SendMessageInput) {
       where: { companyId: interview.application.job.companyId, userId },
     });
     if (!member) {
-      throw new Error("Access denied");
+      throw new ForbiddenError("Access denied");
     }
   }
 

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { screenApplication, getApplicationScreening } from "../services/screening.service";
+import { sendError } from "../utils/http";
 
 export async function screenApplicationHandler(req: Request, res: Response) {
   try {
     const application = await screenApplication(req.user!.userId, req.params.id as string);
     return res.json({ data: application });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to screen application";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to screen application");
   }
 }
 
@@ -16,7 +16,6 @@ export async function getApplicationScreeningHandler(req: Request, res: Response
     const screening = await getApplicationScreening(req.user!.userId, req.params.id as string);
     return res.json({ data: screening });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch screening";
-    return res.status(400).json({ error: message });
+    return sendError(res, error, "Failed to fetch screening");
   }
 }

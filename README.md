@@ -292,6 +292,25 @@ Base URL `http://localhost:4000`. All responses are JSON. Authenticated routes e
 Within each router, literal paths are registered before parameterised ones, so
 `/api/jobs/applications/status` is not swallowed by `/api/jobs/:id`.
 
+### Error responses
+
+Every failure returns `{ "error": "<message>" }` with a status that describes the *kind* of failure,
+so a client can tell a permissions problem from a typo without parsing prose:
+
+| Status | Meaning | Example |
+| --- | --- | --- |
+| `400` | malformed or invalid request | Zod validation failure (`{ error, issues }`) |
+| `401` | no valid credentials | missing bearer token, bad password, unverified email |
+| `403` | authenticated but not permitted | not a member of the company |
+| `404` | resource absent, or route does not exist | unknown job id, unmatched URL |
+| `409` | conflicts with current state | email already registered, slug taken, already applied |
+| `500` | unexpected — logged server-side, generic message returned | — |
+
+Services throw typed errors from `src/utils/errors.ts` (`NotFoundError`, `ForbiddenError`,
+`ConflictError`, …), each carrying its own status code. Controllers pass them through `sendError`, and
+anything that is *not* one of these is treated as unexpected and reported as a `500` without leaking
+internals. Unmatched routes return a JSON `404` rather than Express's default HTML page.
+
 ---
 
 ## Testing
@@ -310,6 +329,10 @@ Covered today: registration (including duplicate and invalid email), login (veri
 wrong password), `GET /api/users/me`, role enforcement on `/api/admin/dashboard`, company creation
 (including owner promotion and automatic subscription), duplicate slug rejection, member invite and
 accept, and profile get-or-create plus nested update.
+
+`http-semantics.test.ts` additionally pins the status-code contract described above — JSON 404s for
+unmatched routes, 404 for a missing resource, 403 for an authenticated-but-forbidden action, 409 for
+state conflicts, and 400 reserved for validation failures — so the distinction cannot regress.
 
 Not yet covered: jobs, applications, screening, coding tests, interviews, notifications, analytics,
 subscriptions, referrals, OAuth callbacks, and token refresh/logout.
@@ -342,13 +365,10 @@ Honest inventory of what is unfinished or unsafe. None of this is hidden behind 
 4. **Rate limiting is in-memory and production-only.** The limiter returns immediately unless
    `NODE_ENV === "production"`, keeps counters in a `Map` that is never evicted, and does not work
    across multiple processes. Redis or a shared store is needed for real deployment.
-5. **Error responses are coarse.** Controllers return `400` for any thrown service error, so
-   authorization failures surface as `400` rather than `401`/`403`. The terminal handler always
-   emits `500`, and there is no `404` handler.
-6. **`GET /api/admin/dashboard` is a placeholder** returning a static object.
-7. **Registration behaves differently per environment.** In development a new user is auto-verified;
+5. **`GET /api/admin/dashboard` is a placeholder** returning a static object.
+6. **Registration behaves differently per environment.** In development a new user is auto-verified;
    in production a verification email is sent; in test neither happens.
-8. **The seeded admin cannot log in** — `prisma/seed.ts` creates the row without a `passwordHash`,
+7. **The seeded admin cannot log in** — `prisma/seed.ts` creates the row without a `passwordHash`,
    and login rejects users that have none. Use it as a role fixture, or register normally.
 9. **Two-factor auth is modelled but not implemented.** `User.twoFactorEnabled` exists and is unused.
 10. **Redis is declared in `docker-compose.yml` but unused** by application code.
